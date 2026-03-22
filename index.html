@@ -850,6 +850,7 @@ function doImport() {
 
   try {
     var newDB = {};
+    text = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
     var lines = text.split('\n');
     var curKey = null;
     var curSec = null;
@@ -911,7 +912,7 @@ function doImport() {
     var cfg = DB._cfg || {};
     DB = newDB;
     DB._cfg = cfg;
-    cur = keys[keys.length-1];
+    cur = keys[0];
     saveDB();
 
     document.getElementById('import-modal').remove();
