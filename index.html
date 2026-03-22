@@ -189,8 +189,8 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
 .fixed-tag{font-size:9px;padding:2px 7px;border-radius:20px;font-weight:500;margin-right:6px;}
 
 .sect-lbl{font-family:"Syne",sans-serif;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin:4px 0 2px;}
-.modal-bg{position:absolute;inset:0;background:rgba(0,0,0,0.72);display:flex;align-items:flex-end;z-index:50;}
-.modal-box{background:var(--bg2);border-radius:var(--r-xl) var(--r-xl) 0 0;padding:24px 20px calc(36px + env(safe-area-inset-bottom));width:100%;border:1px solid var(--border);border-bottom:none;}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.72);display:flex;align-items:flex-end;z-index:50;padding-bottom:env(safe-area-inset-bottom);}
+.modal-box{background:var(--bg2);border-radius:var(--r-xl) var(--r-xl) 0 0;padding:24px 20px 36px;width:100%;border:1px solid var(--border);border-bottom:none;}
 .modal-box h3{font-family:"Syne",sans-serif;font-size:16px;font-weight:700;margin-bottom:18px;}
 .modal-inp{width:100%;font-size:14px;padding:11px 13px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg3);color:var(--text);margin-bottom:12px;}
 .modal-inp:focus{border-color:var(--accent);}
@@ -600,7 +600,7 @@ function showAddMonth() {
   var div = document.createElement('div');
   div.className = 'modal-bg'; div.id = 'mw';
   div.innerHTML = '<div class="modal-box"><h3>Nuevo mes</h3><input class="modal-inp" id="mi" value="' + def + '" placeholder="Ej: Abril 2026"/><div class="mbtns"><button class="mbtn-c" id="mbtn-cancel">Cancelar</button><button class="mbtn-ok" id="mbtn-ok">Crear</button></div></div>';
-  document.getElementById('root').appendChild(div);
+  document.body.appendChild(div);
   div.querySelector('#mbtn-cancel').addEventListener('click', closeM);
   div.querySelector('#mbtn-ok').addEventListener('click', createM);
   setTimeout(function(){ var i=document.getElementById('mi'); if(i){i.focus();i.select();} },80);
@@ -625,7 +625,7 @@ function showCurrencyModal() {
     return '<button class="cur-opt' + (c.code===CC.code?' sel':'') + '" data-code="' + c.code + '"><span class="cur-sym">' + c.symbol + '</span><span style="font-size:11px;font-weight:500;">' + c.code + '</span><span class="cur-nm">' + c.name + '</span></button>';
   }).join('');
   div.innerHTML = '<div class="modal-box"><h3>Seleccionar moneda</h3><div class="cur-grid">' + opts + '</div><div class="mbtns"><button class="mbtn-c" style="flex:1" id="cur-close">Cerrar</button></div></div>';
-  document.getElementById('root').appendChild(div);
+  document.body.appendChild(div);
   div.querySelector('#cur-close').addEventListener('click', function(){ var e=document.getElementById('curm'); if(e) e.remove(); });
   div.querySelectorAll('.cur-opt').forEach(function(btn){
     btn.addEventListener('click', function(){ setCurrency(this.dataset.code); });
