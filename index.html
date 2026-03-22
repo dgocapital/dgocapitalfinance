@@ -190,7 +190,7 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
 
 .sect-lbl{font-family:"Syne",sans-serif;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin:4px 0 2px;}
 .modal-bg{position:absolute;inset:0;background:rgba(0,0,0,0.72);display:flex;align-items:flex-end;z-index:50;}
-.modal-box{background:var(--bg2);border-radius:var(--r-xl) var(--r-xl) 0 0;padding:24px 20px 36px;width:100%;border:1px solid var(--border);border-bottom:none;}
+.modal-box{background:var(--bg2);border-radius:var(--r-xl) var(--r-xl) 0 0;padding:24px 20px calc(36px + env(safe-area-inset-bottom));width:100%;border:1px solid var(--border);border-bottom:none;}
 .modal-box h3{font-family:"Syne",sans-serif;font-size:16px;font-weight:700;margin-bottom:18px;}
 .modal-inp{width:100%;font-size:14px;padding:11px 13px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg3);color:var(--text);margin-bottom:12px;}
 .modal-inp:focus{border-color:var(--accent);}
