@@ -649,7 +649,7 @@ function updateCurrencyUI() {
 function renderCurrent() {
   var d = DB[cur] || emptyMonth();
   var g=sum(d.gano), de=sum(d.debo), inv=sum(d.invierto), con=sum(d.consumo);
-  var bg = g - de - inv - con;
+  var bg = g - de + inv - con;
   var ha = document.getElementById('hero-amount');
   ha.textContent = fmtF(bg);
   ha.className = 'hero-amount' + (bg>0?' pos':bg<0?' neg':'');
@@ -687,7 +687,7 @@ function renderSec(sec) {
   var ids = {gano:'hs-gano',debo:'hs-debo',invierto:'hs-inv',consumo:'hs-con'};
   var d = DB[cur];
   document.getElementById(ids[sec]).textContent = fmt(sum(d[sec]));
-  var bg = sum(d.gano)-sum(d.debo)-sum(d.invierto)-sum(d.consumo);
+  var bg = sum(d.gano)-sum(d.debo)+sum(d.invierto)-sum(d.consumo);
   var ha = document.getElementById('hero-amount');
   ha.textContent = fmtF(bg);
   ha.className = 'hero-amount' + (bg>0?' pos':bg<0?' neg':'');
@@ -729,7 +729,7 @@ function renderDash() {
   document.getElementById('dash-content').style.display='flex';
   var tG=0,tD=0,tI=0,tC=0;
   keys.forEach(function(k){ var d=DB[k]; tG+=sum(d.gano); tD+=sum(d.debo); tI+=sum(d.invierto); tC+=sum(d.consumo); });
-  var totalBG = tG-tD-tI-tC;
+  var totalBG = tG-tD+tI-tC;
   var el = document.getElementById('d-bg-total');
   el.textContent = fmtF(totalBG);
   el.className = 'period-main-val' + (totalBG>0?' pos':totalBG<0?' neg':'');
@@ -737,7 +737,7 @@ function renderDash() {
   document.getElementById('d-tot-debo').textContent=fmt(tD); document.getElementById('d-avg-debo').textContent='Prom: '+fmt(tD/n)+'/mes';
   document.getElementById('d-tot-inv').textContent=fmt(tI); document.getElementById('d-avg-inv').textContent='Prom: '+fmt(tI/n)+'/mes';
   document.getElementById('d-tot-con').textContent=fmt(tC); document.getElementById('d-avg-con').textContent='Prom: '+fmt(tC/n)+'/mes';
-  var bals = keys.map(function(k){ var d=DB[k]; return {k:k,v:sum(d.gano)-sum(d.debo)-sum(d.invierto)-sum(d.consumo)}; });
+  var bals = keys.map(function(k){ var d=DB[k]; return {k:k,v:sum(d.gano)-sum(d.debo)+sum(d.invierto)-sum(d.consumo)}; });
   var maxB = Math.max.apply(null, bals.map(function(x){return Math.abs(x.v);})); maxB = maxB||1;
   document.getElementById('bars-balance').innerHTML = bals.map(function(b){
     var pct=Math.round(Math.abs(b.v)/maxB*100), col=b.v>=0?'var(--green)':'var(--red)';
@@ -750,7 +750,7 @@ function renderDash() {
     return '<div class="bar-row"><div class="bar-lbl">'+c.l+'</div><div class="bar-track"><div class="bar-fill" style="width:'+Math.round(c.v/maxC*100)+'%;background:'+c.c+';"></div></div><div class="bar-val" style="color:'+c.c+'">'+fmt(c.v)+'</div></div>';
   }).join('');
   document.getElementById('months-tbody').innerHTML = keys.slice().reverse().map(function(k){
-    var d=DB[k], g=sum(d.gano), con=sum(d.consumo), bg=g-sum(d.debo)-sum(d.invierto)-con;
+    var d=DB[k], g=sum(d.gano), con=sum(d.consumo), bg=g-sum(d.debo)+sum(d.invierto)-con;
     return '<tr><td>'+k+'</td><td style="color:var(--green)">'+fmt(g)+'</td><td style="color:var(--amber)">'+fmt(con)+'</td><td><span class="badge '+(bg>=0?'badge-pos':'badge-neg')+'">'+fmt(bg)+'</span></td></tr>';
   }).join('');
   var gMap = {};
@@ -782,7 +782,7 @@ function exportData() {
     lines.push('DEUDAS: '+fmtF(sum(d.debo))); d.debo.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val));});
     lines.push('INVERSION: '+fmtF(sum(d.invierto))); d.invierto.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val));});
     lines.push('CONSUMO: '+fmtF(sum(d.consumo))); d.consumo.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val));});
-    var bg=sum(d.gano)-sum(d.debo)-sum(d.invierto)-sum(d.consumo);
+    var bg=sum(d.gano)-sum(d.debo)+sum(d.invierto)-sum(d.consumo);
     lines.push('BALANCE: '+fmtF(bg)); if(d.notes) lines.push('NOTAS: '+d.notes); lines.push('');
   });
   var text = lines.join('\n');
@@ -827,7 +827,9 @@ function renderBudget() {
   var pctEl = document.getElementById('bud-pct');
   var savePct = Math.max(1, Math.min(80, parseFloat(pctEl ? pctEl.value : 10) || 10));
   var metaAhorro = ingresos * (savePct/100);
-  var disponible = ingresos - metaAhorro - totalFixed;
+  var invTotal = sum(d.invierto);
+  var efectivoAhorro = Math.max(metaAhorro, invTotal);
+  var disponible = ingresos - efectivoAhorro - totalFixed;
   var gastadoLibre = sum(d.consumo) - fijos.filter(function(x){return x.sec==='consumo';}).reduce(function(s,x){return s+x.val;},0)
                    - comunes.filter(function(x){return x.sec==='consumo';}).reduce(function(s,x){return s+x.val;},0);
   var usado = totalFixed + gastadoLibre;
