@@ -907,7 +907,13 @@ document.getElementById('notes-ta').addEventListener('input', function(){ DB[cur
   document.getElementById('v-'+sec).addEventListener('keydown', function(e){if(e.key==='Enter')addItem(sec);});
 });
 
-loadDB(); updateCurrencyUI(); renderPills(); renderCurrent();
+loadDB();
+// Restore saved savePct into input
+var budPctEl = document.getElementById('bud-pct');
+if(budPctEl && DB._cfg && DB._cfg.savePct) {
+  budPctEl.value = DB._cfg.savePct;
+}
+updateCurrencyUI(); renderPills(); renderCurrent();
 </script>
 </body>
 </html>
