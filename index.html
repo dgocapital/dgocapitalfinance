@@ -900,8 +900,15 @@ function doImport() {
           // All dots are thousands separators in COP format
           valStr = valStr.replace(/\./g,'');
         }
+        // Detect tipo tag: "$ 1.273.734 [fijo]" or "$ 80.000 [comun]"
+        var tipo = 'normal';
+        var tipoMatch = valRaw.match(/\[(fijo|comun)\]/i);
+        if (tipoMatch) {
+          tipo = tipoMatch[1].toLowerCase();
+          valStr = valStr.replace(/\[.*?\]/g,'').trim();
+        }
         var val = parseFloat(valStr) || 0;
-        if (desc && val >= 0) newDB[curKey][curSec].push({desc:desc, val:val, tipo:'normal'});
+        if (desc && val >= 0) newDB[curKey][curSec].push({desc:desc, val:val, tipo:tipo});
       }
     });
 
@@ -930,10 +937,10 @@ function exportData() {
   var lines = ['DGO Capital Finance - Exportacion','Moneda: '+CC.code+' ('+CC.symbol+')',''];
   keys.forEach(function(k){
     var d = DB[k]; lines.push('=== '+k+' ===');
-    lines.push('INGRESOS: '+fmtF(sum(d.gano))); d.gano.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val));});
-    lines.push('DEUDAS: '+fmtF(sum(d.debo))); d.debo.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val));});
-    lines.push('INVERSION: '+fmtF(sum(d.invierto))); d.invierto.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val));});
-    lines.push('CONSUMO: '+fmtF(sum(d.consumo))); d.consumo.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val));});
+    lines.push('INGRESOS: '+fmtF(sum(d.gano))); d.gano.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val)+(it.tipo&&it.tipo!=='normal'?' ['+it.tipo+']':''));});
+    lines.push('DEUDAS: '+fmtF(sum(d.debo))); d.debo.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val)+(it.tipo&&it.tipo!=='normal'?' ['+it.tipo+']':''));});
+    lines.push('INVERSION: '+fmtF(sum(d.invierto))); d.invierto.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val)+(it.tipo&&it.tipo!=='normal'?' ['+it.tipo+']':''));});
+    lines.push('CONSUMO: '+fmtF(sum(d.consumo))); d.consumo.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val)+(it.tipo&&it.tipo!=='normal'?' ['+it.tipo+']':''));});
     var bg=sum(d.gano)-sum(d.debo)+sum(d.invierto)-sum(d.consumo);
     lines.push('BALANCE: '+fmtF(bg)); if(d.notes) lines.push('NOTAS: '+d.notes); lines.push('');
   });
