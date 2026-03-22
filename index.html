@@ -188,6 +188,26 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
 .fixed-val{font-size:12px;font-weight:500;}
 .fixed-tag{font-size:9px;padding:2px 7px;border-radius:20px;font-weight:500;margin-right:6px;}
 
+.growth-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;overflow:hidden;}
+.growth-title{font-family:"Syne",sans-serif;font-size:13px;font-weight:600;margin-bottom:4px;}
+.growth-sub{font-size:10px;color:var(--text3);margin-bottom:14px;}
+.chart-wrap{position:relative;width:100%;height:160px;}
+.chart-wrap canvas{width:100%!important;height:160px!important;}
+.chart-legend{display:flex;gap:14px;margin-top:10px;flex-wrap:wrap;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2);}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.notif-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;}
+.notif-title{font-family:"Syne",sans-serif;font-size:13px;font-weight:600;margin-bottom:10px;}
+.notif-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.notif-lbl{font-size:12px;color:var(--text2);}
+.notif-time{font-size:13px;padding:7px 10px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);width:110px;}
+.notif-btn{padding:8px 16px;border-radius:20px;border:none;background:var(--accent);color:#fff;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;}
+.notif-btn:active{opacity:0.8;}
+.notif-status{font-size:11px;margin-top:8px;padding:7px 10px;border-radius:var(--r-sm);}
+.notif-status.ok{background:var(--green-dim);color:var(--green);}
+.notif-status.warn{background:var(--amber-soft);color:var(--amber);}
+.notif-status.err{background:var(--red-dim);color:var(--red);}
+
 .sect-lbl{font-family:"Syne",sans-serif;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin:4px 0 2px;}
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.72);display:flex;align-items:flex-end;z-index:50;padding-bottom:env(safe-area-inset-bottom);}
 .modal-box{background:var(--bg2);border-radius:var(--r-xl) var(--r-xl) 0 0;padding:24px 20px 36px;width:100%;border:1px solid var(--border);border-bottom:none;}
@@ -451,6 +471,16 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
         <table class="months-table"><thead><tr><th>Mes</th><th>Gano</th><th>Consumo</th><th>Balance</th></tr></thead><tbody id="months-tbody"></tbody></table>
       </div>
       <div class="chart-card"><div class="chart-title">Top gastos recurrentes</div><div id="top-gastos"></div></div>
+
+      <div class="growth-card">
+        <div class="growth-title">Crecimiento patrimonial</div>
+        <div class="growth-sub">Balance acumulado mes a mes</div>
+        <div class="chart-wrap"><canvas id="growth-chart"></canvas></div>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--accent);"></div>Balance mensual</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--green);"></div>Tendencia</div>
+        </div>
+      </div>
     </div>
     <div style="height:6px;"></div>
   </div>
@@ -482,6 +512,17 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
       <div class="storage-item"><div class="storage-dot" style="background:var(--amber);"></div><div class="storage-txt"><b>Persiste entre sesiones</b> mientras uses el mismo navegador en el mismo dispositivo.</div></div>
       <div class="storage-item"><div class="storage-dot" style="background:var(--accent);"></div><div class="storage-txt"><b>Haz respaldo</b> usando Exportar para enviarte los datos por WhatsApp o notas.</div></div>
     </div>
+    <div class="sect-lbl">Recordatorio diario</div>
+    <div class="notif-card">
+      <div class="notif-title">Registra tus gastos</div>
+      <div class="notif-row">
+        <span class="notif-lbl">Hora del recordatorio:</span>
+        <input type="time" class="notif-time" id="notif-time" value="21:00"/>
+        <button class="notif-btn" id="btn-notif">Activar</button>
+      </div>
+      <div id="notif-status" class="notif-status warn" style="display:none;"></div>
+    </div>
+
     <button class="danger-btn" id="btn-clear">Borrar todos los datos</button>
     <div style="height:6px;"></div>
   </div>
@@ -769,6 +810,7 @@ function renderDash() {
     });
   });
   var top = Object.values(gMap).sort(function(a,b){return b.total-a.total;}).slice(0,8);
+  setTimeout(renderGrowthChart, 100);
   document.getElementById('top-gastos').innerHTML = top.length===0
     ? '<div style="font-size:12px;color:var(--text3);">Sin gastos aun</div>'
     : top.map(function(g){ return '<div class="ti-row"><span class="ti-name">'+g.name+' <span style="color:var(--text3);font-size:10px;">(x'+g.count+')</span></span><span class="ti-val">'+fmt(g.total)+'</span></div>'; }).join('');
@@ -778,6 +820,7 @@ function renderSettings() {
   var n = mkeys().length;
   document.getElementById('set-months-count').textContent = n + (n===1?' mes registrado':' meses registrados');
   updateCurrencyUI();
+  initNotification();
 }
 
 function exportData() {
@@ -897,6 +940,167 @@ function renderBudget() {
   }
 }
 
+
+var growthChartInstance = null;
+
+function renderGrowthChart() {
+  var keys = mkeys();
+  if (!keys.length || typeof Chart === 'undefined') return;
+  var canvas = document.getElementById('growth-chart');
+  if (!canvas) return;
+
+  // Build data: balance per month
+  var labels = keys.map(function(k){ return k.split(' ')[0].substring(0,3)+' '+k.split(' ')[1]; });
+  var balances = keys.map(function(k){
+    var d = DB[k];
+    return sum(d.gano) - sum(d.debo) + sum(d.invierto) - sum(d.consumo);
+  });
+
+  // Trend line (simple moving average)
+  var trend = balances.map(function(v,i){
+    var slice = balances.slice(Math.max(0,i-1), i+2);
+    return slice.reduce(function(a,b){return a+b;},0)/slice.length;
+  });
+
+  var accentColor = '#7c6ef0';
+  var greenColor = '#22c48a';
+  var gridColor = 'rgba(255,255,255,0.06)';
+  var textColor = '#9898b8';
+
+  if (growthChartInstance) { growthChartInstance.destroy(); growthChartInstance = null; }
+
+  growthChartInstance = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Balance',
+          data: balances,
+          borderColor: accentColor,
+          backgroundColor: 'rgba(124,110,240,0.12)',
+          borderWidth: 2.5,
+          pointBackgroundColor: accentColor,
+          pointRadius: keys.length <= 6 ? 5 : 3,
+          pointHoverRadius: 7,
+          fill: true,
+          tension: 0.4,
+        },
+        {
+          label: 'Tendencia',
+          data: trend,
+          borderColor: greenColor,
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          borderDash: [6,4],
+          pointRadius: 0,
+          fill: false,
+          tension: 0.4,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1e1e36',
+          titleColor: '#e8e8f4',
+          bodyColor: '#9898b8',
+          borderColor: '#2a2a48',
+          borderWidth: 1,
+          callbacks: {
+            label: function(ctx) {
+              return ' ' + ctx.dataset.label + ': ' + fmtF(ctx.parsed.y);
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: textColor, font: { size: 10 } },
+          grid: { color: gridColor },
+          border: { color: gridColor }
+        },
+        y: {
+          ticks: {
+            color: textColor,
+            font: { size: 10 },
+            callback: function(v) { return fmtF(v); }
+          },
+          grid: { color: gridColor },
+          border: { color: gridColor }
+        }
+      }
+    }
+  });
+}
+
+// Notifications
+function initNotification() {
+  var saved = DB._cfg && DB._cfg.notifTime;
+  var timeEl = document.getElementById('notif-time');
+  var statusEl = document.getElementById('notif-status');
+  if (!timeEl) return;
+  if (saved) timeEl.value = saved;
+
+  if (!('Notification' in window)) {
+    showNotifStatus('Tu navegador no soporta notificaciones', 'err');
+    return;
+  }
+  if (Notification.permission === 'granted' && saved) {
+    showNotifStatus('Recordatorio activo a las ' + saved + ' cada dia', 'ok');
+  }
+}
+
+function showNotifStatus(msg, type) {
+  var el = document.getElementById('notif-status');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'notif-status ' + type;
+  el.style.display = 'block';
+}
+
+function scheduleNotification(timeStr) {
+  if (!('Notification' in window)) {
+    showNotifStatus('Notificaciones no disponibles en este navegador', 'err');
+    return;
+  }
+  Notification.requestPermission().then(function(perm) {
+    if (perm !== 'granted') {
+      showNotifStatus('Permiso de notificaciones denegado', 'err');
+      return;
+    }
+    if (!DB._cfg) DB._cfg = {};
+    DB._cfg.notifTime = timeStr;
+    saveDB();
+    showNotifStatus('Recordatorio activo a las ' + timeStr + ' cada dia', 'ok');
+    triggerDailyNotif(timeStr);
+  });
+}
+
+function triggerDailyNotif(timeStr) {
+  var parts = timeStr.split(':');
+  var h = parseInt(parts[0]), m = parseInt(parts[1]);
+  var now = new Date();
+  var target = new Date();
+  target.setHours(h, m, 0, 0);
+  if (target <= now) target.setDate(target.getDate() + 1);
+  var delay = target - now;
+  setTimeout(function() {
+    if (Notification.permission === 'granted') {
+      new Notification('DGO Capital Finance', {
+        body: 'No olvides registrar tus gastos del dia!',
+        icon: 'apple-touch-icon.png',
+        badge: 'apple-touch-icon.png'
+      });
+    }
+    triggerDailyNotif(timeStr);
+  }, delay);
+}
+
 document.getElementById('btn-add-month').addEventListener('click', showAddMonth);
 document.getElementById('cur-badge').addEventListener('click', showCurrencyModal);
 document.getElementById('bud-pct').addEventListener('keydown', function(e){
@@ -907,6 +1111,10 @@ document.getElementById('nav-dashboard').addEventListener('click', function(){go
 document.getElementById('nav-ajustes').addEventListener('click', function(){goView('ajustes');});
 document.getElementById('row-currency').addEventListener('click', showCurrencyModal);
 document.getElementById('btn-export').addEventListener('click', exportData);
+document.getElementById('btn-notif').addEventListener('click', function(){
+  var t = document.getElementById('notif-time').value || '21:00';
+  scheduleNotification(t);
+});
 document.getElementById('btn-clear').addEventListener('click', confirmClear);
 document.getElementById('notes-ta').addEventListener('input', function(){ DB[cur].notes=this.value; saveDB(); });
 
@@ -918,6 +1126,9 @@ document.getElementById('notes-ta').addEventListener('input', function(){ DB[cur
 });
 
 loadDB();
+if (typeof Notification !== 'undefined' && Notification.permission === 'granted' && DB._cfg && DB._cfg.notifTime) {
+  triggerDailyNotif(DB._cfg.notifTime);
+}
 // Restore saved savePct into input
 var budPctEl = document.getElementById('bud-pct');
 if(budPctEl && DB._cfg && DB._cfg.savePct) {
@@ -925,5 +1136,6 @@ if(budPctEl && DB._cfg && DB._cfg.savePct) {
 }
 updateCurrencyUI(); renderPills(); renderCurrent();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </body>
 </html>
