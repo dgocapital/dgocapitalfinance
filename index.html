@@ -135,17 +135,55 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
 .set-sub{font-size:11px;color:var(--text3);margin-top:2px;}
 .set-btn{font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;}
 .danger-btn{width:100%;padding:13px;border-radius:var(--r);border:1px solid var(--red-soft);background:transparent;color:var(--red);font-size:13px;cursor:pointer;}
-.install-card{background:var(--accent-dim);border:1px solid var(--accent);border-radius:var(--r-lg);padding:16px;}
-.install-title{font-family:"Syne",sans-serif;font-size:14px;font-weight:700;color:var(--accent2);margin-bottom:10px;}
-.install-steps{display:flex;flex-direction:column;gap:8px;}
-.install-step{display:flex;gap:10px;align-items:flex-start;}
-.step-num{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
-.step-txt{font-size:12px;color:var(--text2);line-height:1.5;}
+
+
+
+
+
+
 .storage-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;display:flex;flex-direction:column;gap:10px;}
 .storage-item{display:flex;gap:10px;align-items:flex-start;}
 .storage-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
 .storage-txt{font-size:12px;color:var(--text2);line-height:1.5;}
 .storage-txt b{color:var(--text);font-weight:500;}
+
+.tag-fijo{display:inline-block;font-size:9px;padding:2px 7px;border-radius:20px;background:#1a3850;color:#5ab4f0;font-weight:500;margin-left:4px;vertical-align:middle;}
+.tag-comun{display:inline-block;font-size:9px;padding:2px 7px;border-radius:20px;background:#2d2218;color:#f0a832;font-weight:500;margin-left:4px;vertical-align:middle;}
+.irow-type{display:flex;gap:4px;margin-left:4px;flex-shrink:0;}
+.type-btn{font-size:9px;padding:2px 7px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;}
+.type-btn.fijo{background:#1a3850;color:#5ab4f0;border-color:#1a3850;}
+.type-btn.comun{background:#2d2218;color:#f0a832;border-color:#2d2218;}
+.add-form-ext{display:flex;gap:6px;padding:0 11px 11px;align-items:center;}
+.tipo-sel{font-size:11px;padding:7px 8px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;flex-shrink:0;}
+.bud-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-xl);padding:18px;position:relative;overflow:hidden;}
+.bud-card::before{content:"";position:absolute;top:-40px;right:-40px;width:130px;height:130px;background:var(--green);opacity:0.04;border-radius:50%;}
+.bud-title{font-family:"Syne",sans-serif;font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.bud-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);}
+.bud-row:last-child{border-bottom:none;}
+.bud-lbl{font-size:12px;color:var(--text2);}
+.bud-lbl-sub{font-size:10px;color:var(--text3);margin-top:2px;}
+.bud-val{font-size:13px;font-weight:500;}
+.bud-bar-wrap{margin:14px 0 6px;}
+.bud-bar-lbl{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:5px;}
+.bud-bar-track{height:10px;background:var(--bg2);border-radius:5px;overflow:hidden;}
+.bud-bar-fill{height:100%;border-radius:5px;transition:width 0.4s ease;}
+.bud-alert{border-radius:var(--r);padding:10px 12px;font-size:12px;margin-top:10px;line-height:1.5;}
+.bud-alert.ok{background:var(--green-dim);color:var(--green);}
+.bud-alert.warn{background:#3a2808;color:#f0a832;}
+.bud-alert.danger{background:var(--red-dim);color:var(--red);}
+.bud-meta-row{display:flex;gap:6px;margin-bottom:14px;align-items:center;flex-wrap:wrap;}
+.bud-meta-lbl{font-size:12px;color:var(--text2);}
+.bud-pct-input{width:64px;font-size:13px;padding:6px 10px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);text-align:center;}
+.bud-pct-input:focus{border-color:var(--accent);}
+.fixed-list{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;}
+.fixed-list-hd{padding:12px 15px;font-family:"Syne",sans-serif;font-size:13px;font-weight:600;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.fixed-hd-sub{font-size:10px;color:var(--text3);font-family:"DM Sans",sans-serif;font-weight:400;}
+.fixed-row{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border);}
+.fixed-row:last-child{border-bottom:none;}
+.fixed-name{font-size:12px;color:var(--text2);}
+.fixed-val{font-size:12px;font-weight:500;}
+.fixed-tag{font-size:9px;padding:2px 7px;border-radius:20px;font-weight:500;margin-right:6px;}
+
 .sect-lbl{font-family:"Syne",sans-serif;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin:4px 0 2px;}
 .modal-bg{position:absolute;inset:0;background:rgba(0,0,0,0.72);display:flex;align-items:flex-end;z-index:50;}
 .modal-box{background:var(--bg2);border-radius:var(--r-xl) var(--r-xl) 0 0;padding:24px 20px 36px;width:100%;border:1px solid var(--border);border-bottom:none;}
@@ -222,6 +260,14 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
           <input class="inp-v" id="v-gano" type="number" placeholder="Valor"/>
           <button class="btn-plus" id="btn-gano" style="background:var(--green);color:#fff;">+</button>
         </div>
+        <div class="add-form-ext">
+          <span style="font-size:11px;color:var(--text3);">Tipo:</span>
+          <select class="tipo-sel" id="tipo-gano">
+            <option value="normal">Normal</option>
+            <option value="fijo">&#128274; Fijo</option>
+            <option value="comun">&#128260; Comun</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -245,6 +291,14 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
           <input class="inp-d" id="d-debo" placeholder="Descripcion"/>
           <input class="inp-v" id="v-debo" type="number" placeholder="Valor"/>
           <button class="btn-plus" id="btn-debo" style="background:var(--red);color:#fff;">+</button>
+        </div>
+        <div class="add-form-ext">
+          <span style="font-size:11px;color:var(--text3);">Tipo:</span>
+          <select class="tipo-sel" id="tipo-debo">
+            <option value="normal">Normal</option>
+            <option value="fijo">&#128274; Fijo</option>
+            <option value="comun">&#128260; Comun</option>
+          </select>
         </div>
       </div>
     </div>
@@ -270,6 +324,14 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
           <input class="inp-v" id="v-invierto" type="number" placeholder="Valor"/>
           <button class="btn-plus" id="btn-invierto" style="background:var(--blue);color:#fff;">+</button>
         </div>
+        <div class="add-form-ext">
+          <span style="font-size:11px;color:var(--text3);">Tipo:</span>
+          <select class="tipo-sel" id="tipo-invierto">
+            <option value="normal">Normal</option>
+            <option value="fijo">&#128274; Fijo</option>
+            <option value="comun">&#128260; Comun</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -294,6 +356,14 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
           <input class="inp-v" id="v-consumo" type="number" placeholder="Valor"/>
           <button class="btn-plus" id="btn-consumo" style="background:var(--amber);color:#fff;">+</button>
         </div>
+        <div class="add-form-ext">
+          <span style="font-size:11px;color:var(--text3);">Tipo:</span>
+          <select class="tipo-sel" id="tipo-consumo">
+            <option value="normal">Normal</option>
+            <option value="fijo">&#128274; Fijo</option>
+            <option value="comun">&#128260; Comun</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -301,6 +371,50 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
       <div class="notes-hd">Notas del mes</div>
       <textarea class="notes-ta" id="notes-ta" placeholder="Observaciones, metas, recordatorios..."></textarea>
     </div>
+    <div style="height:6px;"></div>
+  </div>
+
+
+  <div class="view" id="view-presupuesto">
+    <div>
+      <div class="dash-title">Presupuesto</div>
+      <div class="dash-sub" id="bud-period-lbl">Basado en el mes actual</div>
+    </div>
+
+    <!-- Meta de ahorro -->
+    <div class="bud-card">
+      <div class="bud-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg>
+        Meta de ahorro / inversión
+      </div>
+      <div class="bud-meta-row">
+        <span class="bud-meta-lbl">Porcentaje mínimo de ahorro:</span>
+        <input class="bud-pct-input" id="bud-pct" type="number" min="1" max="80" value="10"/>
+        <span class="bud-meta-lbl">%</span>
+      </div>
+      <div id="bud-summary"></div>
+    </div>
+
+    <!-- Disponible para gastar -->
+    <div class="bud-card" id="bud-disponible-card">
+      <div class="bud-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Disponible para gastar
+      </div>
+      <div id="bud-disponible"></div>
+    </div>
+
+    <!-- Gastos fijos y comunes registrados -->
+    <div class="fixed-list">
+      <div class="fixed-list-hd">
+        <span>Gastos fijos y comunes</span>
+        <span class="fixed-hd-sub" id="fixed-total-lbl">Total: $ 0</span>
+      </div>
+      <div id="fixed-items-list">
+        <div class="empty-msg">Marca ítems como Fijo o Común al registrarlos</div>
+      </div>
+    </div>
+
     <div style="height:6px;"></div>
   </div>
 
@@ -362,9 +476,7 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
       <div class="storage-item"><div class="storage-dot" style="background:var(--amber);"></div><div class="storage-txt"><b>Persiste entre sesiones</b> mientras uses el mismo navegador en el mismo dispositivo.</div></div>
       <div class="storage-item"><div class="storage-dot" style="background:var(--accent);"></div><div class="storage-txt"><b>Haz respaldo</b> usando Exportar para enviarte los datos por WhatsApp o notas.</div></div>
     </div>
-    <div class="sect-lbl">Instalar en tu celular</div>
-    <div class="install-card">
-      <div class="install-title">Como instalarla</div>
+    
       <div class="install-steps">
         <div class="install-step"><div class="step-num">1</div><div class="step-txt">Descarga el archivo HTML y pasalo a tu celular</div></div>
         <div class="install-step"><div class="step-num">2</div><div class="step-txt"><b>Android:</b> Abre en Chrome &rarr; menu &#8942; &rarr; Agregar a pantalla de inicio</div></div>
@@ -387,6 +499,10 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
     <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
     Control
   </button>
+  <button class="nav-btn" id="nav-presupuesto">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    Presupuesto
+  </button>
   <button class="nav-btn" id="nav-ajustes">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
     Ajustes
@@ -405,10 +521,7 @@ const CURRENCIES = [
   {code:'CLP',symbol:'$',name:'Pesos chilenos',loc:'es-CL',dec:0},
   {code:'PEN',symbol:'S/',name:'Sol peruano',loc:'es-PE',dec:2},
   {code:'BRL',symbol:'R$',name:'Real brasileno',loc:'pt-BR',dec:2},
-  {code:'GBP',symbol:'\u00a3',name:'Libra esterlina',loc:'en-GB',dec:2},
-  {code:'CAD',symbol:'CA$',name:'Dolar canadiense',loc:'en-CA',dec:2},
-  {code:'VES',symbol:'Bs',name:'Bolivar venezolano',loc:'es-VE',dec:2},
-  {code:'CRC',symbol:'\u20a1',name:'Colon costarricense',loc:'es-CR',dec:0}
+  {code:'GBP',symbol:'\u00a3',name:'Libra esterlina',loc:'en-GB',dec:2}
 ];
 const MES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
@@ -462,6 +575,7 @@ function goView(v) {
   document.getElementById('content').scrollTop = 0;
   if (v==='dashboard') renderDash();
   if (v==='ajustes') renderSettings();
+  if (v==='presupuesto') renderBudget();
 }
 
 function renderPills() {
@@ -565,7 +679,11 @@ function renderSec(sec) {
   items.forEach(function(it, i){
     var row = document.createElement('div');
     row.className = 'irow';
-    var nm = document.createElement('span'); nm.className='iname'; nm.textContent = it.desc;
+    var nm = document.createElement('span'); nm.className='iname';
+    var tag = '';
+    if(it.tipo==='fijo') tag='<span class="tag-fijo">Fijo</span>';
+    else if(it.tipo==='comun') tag='<span class="tag-comun">Comun</span>';
+    nm.innerHTML = it.desc + tag;
     var vl = document.createElement('span'); vl.className='ival'; vl.style.color=cols[sec]; vl.textContent = fmtF(it.val);
     var dl = document.createElement('button'); dl.className='idel'; dl.textContent='\u00d7';
     dl.dataset.sec = sec; dl.dataset.idx = i;
@@ -586,17 +704,19 @@ function renderSec(sec) {
 function addItem(sec) {
   var d = document.getElementById('d-'+sec);
   var v = document.getElementById('v-'+sec);
+  var t = document.getElementById('tipo-'+sec);
   var desc = d.value.trim();
   var val = parseFloat(v.value) || 0;
   if (!desc) return;
-  DB[cur][sec].push({desc:desc, val:val});
+  var tipo = t ? t.value : 'normal';
+  DB[cur][sec].push({desc:desc, val:val, tipo:tipo});
   d.value = ''; v.value = '';
-  saveDB(); renderSec(sec); d.focus();
+  saveDB(); renderSec(sec); renderBudget();d.focus();
 }
 
 function delItem(sec, i) {
   DB[cur][sec].splice(i,1);
-  saveDB(); renderSec(sec);
+  saveDB(); renderSec(sec); renderBudget();
 }
 
 function toggleSec(sec) {
@@ -689,6 +809,83 @@ function confirmClear() {
 }
 
 // Wire up all event listeners safely after DOM is ready
+
+document.getElementById('nav-presupuesto').addEventListener('click', function(){goView('presupuesto');});
+document.getElementById('bud-pct').addEventListener('input', renderBudget);
+
+function renderBudget() {
+  var d = DB[cur] || {gano:[],debo:[],invierto:[],consumo:[],notes:''};
+  var allItems = d.gano.concat(d.debo, d.invierto, d.consumo);
+
+  // Collect fixed and common from ALL sections
+  var fijos = [], comunes = [];
+  ['consumo','debo','invierto'].forEach(function(sec){
+    (d[sec]||[]).forEach(function(it){
+      if(it.tipo==='fijo') fijos.push({name:it.desc, val:Number(it.val)||0, sec:sec});
+      else if(it.tipo==='comun') comunes.push({name:it.desc, val:Number(it.val)||0, sec:sec});
+    });
+  });
+
+  var totalFijos = fijos.reduce(function(s,x){return s+x.val;},0);
+  var totalComunes = comunes.reduce(function(s,x){return s+x.val;},0);
+  var totalFixed = totalFijos + totalComunes;
+
+  // Budget calc
+  var ingresos = sum(d.gano);
+  var pctEl = document.getElementById('bud-pct');
+  var savePct = Math.max(1, Math.min(80, parseFloat(pctEl ? pctEl.value : 10) || 10));
+  var metaAhorro = ingresos * (savePct/100);
+  var disponible = ingresos - metaAhorro - totalFixed;
+  var gastadoLibre = sum(d.consumo) - fijos.filter(function(x){return x.sec==='consumo';}).reduce(function(s,x){return s+x.val;},0)
+                   - comunes.filter(function(x){return x.sec==='consumo';}).reduce(function(s,x){return s+x.val;},0);
+  var usado = totalFixed + gastadoLibre;
+  var pctUsado = ingresos > 0 ? Math.min(100, Math.round(usado/ingresos*100)) : 0;
+  var pctDisp = ingresos > 0 ? Math.round(disponible/ingresos*100) : 0;
+
+  document.getElementById('bud-period-lbl').textContent = 'Basado en ' + cur;
+
+  // Summary card
+  var sumEl = document.getElementById('bud-summary');
+  sumEl.innerHTML = [
+    {l:'Ingresos del mes', sub:'', v:fmtF(ingresos), c:'var(--green)'},
+    {l:'Meta ahorro / inversión ('+savePct+'%)', sub:'Mínimo recomendado', v:fmtF(metaAhorro), c:'var(--blue)'},
+    {l:'Gastos fijos y comunes', sub:fijos.length+' fijos, '+comunes.length+' comunes', v:fmtF(totalFixed), c:'var(--amber)'},
+    {l:'Máximo disponible para gastar', sub:'Ingresos - ahorro - fijos', v:fmtF(Math.max(0,disponible)), c: disponible>=0?'var(--green)':'var(--red)'},
+  ].map(function(r){
+    return '<div class="bud-row"><div><div class="bud-lbl">'+r.l+'</div>'+(r.sub?'<div class="bud-lbl-sub">'+r.sub+'</div>':'')+'</div><div class="bud-val" style="color:'+r.c+'">'+r.v+'</div></div>';
+  }).join('');
+
+  // Disponible card
+  var dispEl = document.getElementById('bud-disponible');
+  var barColor = pctUsado < 70 ? 'var(--green)' : pctUsado < 90 ? 'var(--amber)' : 'var(--red)';
+  var alertClass = pctUsado < 70 ? 'ok' : pctUsado < 90 ? 'warn' : 'danger';
+  var alertMsg = pctUsado < 70
+    ? '&#10003; Vas bien. Te quedan ' + fmtF(Math.max(0,disponible - gastadoLibre)) + ' de margen libre este mes.'
+    : pctUsado < 90
+    ? '&#9888; Precaucion. Has usado el '+pctUsado+'% de tu presupuesto disponible.'
+    : '&#9888; Alerta. Has superado o estas muy cerca del limite de gasto libre.';
+
+  dispEl.innerHTML = '<div class="bud-bar-wrap">'
+    + '<div class="bud-bar-lbl"><span>Gastado libre: '+fmtF(gastadoLibre)+'</span><span>Maximo: '+fmtF(Math.max(0,disponible))+'</span></div>'
+    + '<div class="bud-bar-track"><div class="bud-bar-fill" style="width:'+Math.min(100,pctUsado)+'%;background:'+barColor+';"></div></div>'
+    + '</div>'
+    + '<div class="bud-alert '+alertClass+'">'+alertMsg+'</div>';
+
+  // Fixed items list
+  var fixedEl = document.getElementById('fixed-items-list');
+  var allFixed = fijos.concat(comunes);
+  document.getElementById('fixed-total-lbl').textContent = 'Total: ' + fmtF(totalFixed);
+  if (!allFixed.length) {
+    fixedEl.innerHTML = '<div class="empty-msg">Marca ítems como Fijo o Comun al registrarlos</div>';
+  } else {
+    fixedEl.innerHTML = allFixed.map(function(it){
+      var tagCls = fijos.indexOf(it)>=0 ? 'tag-fijo' : 'tag-comun';
+      var tagLbl = fijos.indexOf(it)>=0 ? 'Fijo' : 'Comun';
+      return '<div class="fixed-row"><span class="fixed-name"><span class="fixed-tag '+tagCls+'">'+tagLbl+'</span>'+it.name+'</span><span class="fixed-val" style="color:var(--amber)">'+fmtF(it.val)+'</span></div>';
+    }).join('');
+  }
+}
+
 document.getElementById('btn-add-month').addEventListener('click', showAddMonth);
 document.getElementById('cur-badge').addEventListener('click', showCurrencyModal);
 document.getElementById('nav-registro').addEventListener('click', function(){goView('registro');});
