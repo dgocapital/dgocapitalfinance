@@ -503,7 +503,8 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
         </div>
       </div>
       <div class="set-row"><div><div class="set-label">Meses registrados</div><div class="set-sub" id="set-months-count">0 meses</div></div></div>
-      <div class="set-row"><div><div class="set-label">Exportar datos</div><div class="set-sub">Comparte o copia todos tus datos</div></div><button class="set-btn" id="btn-export">Exportar</button></div>
+      <div class="set-row"><div><div class="set-label">Exportar datos</div><div class="set-sub">Copia o comparte todos tus registros</div></div><button class="set-btn" id="btn-export">Exportar</button></div>
+      <div class="set-row"><div><div class="set-label">Importar datos</div><div class="set-sub">Restaura un respaldo exportado</div></div><button class="set-btn" id="btn-import" style="color:var(--green);">Importar</button></div>
       <div class="set-row"><div><div class="set-label">Version</div><div class="set-sub">DGO Capital Finance v1.1</div></div></div>
     </div>
     <div class="sect-lbl">Donde se guardan tus datos</div>
@@ -824,6 +825,89 @@ function renderSettings() {
   initNotification();
 }
 
+function showImportModal() {
+  var ex = document.getElementById('import-modal'); if(ex) ex.remove();
+  var div = document.createElement('div');
+  div.className = 'modal-bg'; div.id = 'import-modal';
+  div.innerHTML = '<div class="modal-box">'
+    + '<h3>Importar datos</h3>'
+    + '<p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5;">Pega aqui el texto que exportaste anteriormente. Tus datos actuales seran reemplazados.</p>'
+    + '<textarea id="import-ta" style="width:100%;height:140px;font-size:11px;padding:10px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg3);color:var(--text);resize:none;font-family:var(--font-sans);line-height:1.5;" placeholder="Pega aqui el texto exportado..."></textarea>'
+    + '<div id="import-err" style="font-size:11px;color:var(--red);margin:6px 0;display:none;"></div>'
+    + '<div class="mbtns" style="margin-top:10px;">'
+    + '<button class="mbtn-c" id="import-cancel">Cancelar</button>'
+    + '<button class="mbtn-ok" id="import-ok" style="background:var(--green);">Restaurar</button>'
+    + '</div></div>';
+  document.body.appendChild(div);
+  div.querySelector('#import-cancel').addEventListener('click', function(){ div.remove(); });
+  div.querySelector('#import-ok').addEventListener('click', function(){ doImport(); });
+}
+
+function doImport() {
+  var text = (document.getElementById('import-ta').value || '').trim();
+  var errEl = document.getElementById('import-err');
+  if (!text) { errEl.textContent = 'Pega el texto exportado primero.'; errEl.style.display='block'; return; }
+
+  try {
+    var newDB = {};
+    var lines = text.split('\n');
+    var curKey = null;
+    var curSec = null;
+    var MES_LIST = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+    lines.forEach(function(line) {
+      line = line.trim();
+      // Month header: === Enero 2026 ===
+      var mMatch = line.match(/^===\s*(.+?)\s*===$/);
+      if (mMatch) {
+        curKey = mMatch[1];
+        newDB[curKey] = {gano:[],debo:[],invierto:[],consumo:[],notes:''};
+        curSec = null;
+        return;
+      }
+      if (!curKey) return;
+
+      // Section headers
+      if (line.startsWith('INGRESOS:')) { curSec = 'gano'; return; }
+      if (line.startsWith('DEUDAS:')) { curSec = 'debo'; return; }
+      if (line.startsWith('INVERSION:')) { curSec = 'invierto'; return; }
+      if (line.startsWith('CONSUMO:')) { curSec = 'consumo'; return; }
+      if (line.startsWith('BALANCE:') || line.startsWith('Moneda:') || line.startsWith('DGO Capital')) { curSec = null; return; }
+      if (line.startsWith('NOTAS:')) { newDB[curKey].notes = line.replace('NOTAS:','').trim(); curSec = null; return; }
+
+      // Items: "  Descripcion: $1.234.567" or "  Descripcion: $ 1.234.567"
+      if (curSec && line.startsWith('  ')) {
+        var clean = line.trim();
+        var lastColon = clean.lastIndexOf(':');
+        if (lastColon < 0) return;
+        var desc = clean.substring(0, lastColon).trim();
+        var valStr = clean.substring(lastColon+1).trim()
+          .replace(/\$/g,'').replace(/[.]/g,'').replace(/[,]/g,'.').replace(/\s/g,'').replace(/-/g,'');
+        var val = parseFloat(valStr) || 0;
+        if (desc) newDB[curKey][curSec].push({desc:desc, val:val, tipo:'normal'});
+      }
+    });
+
+    var keys = Object.keys(newDB);
+    if (!keys.length) throw new Error('No se encontraron meses en el texto.');
+
+    // Preserve settings
+    var cfg = DB._cfg || {};
+    DB = newDB;
+    DB._cfg = cfg;
+    cur = keys[keys.length-1];
+    saveDB();
+
+    document.getElementById('import-modal').remove();
+    renderPills();
+    renderCurrent();
+    alert('Datos restaurados correctamente. ' + keys.length + ' mes(es) importados.');
+  } catch(e) {
+    errEl.textContent = 'Error al importar: ' + e.message;
+    errEl.style.display = 'block';
+  }
+}
+
 function exportData() {
   var keys = mkeys();
   var lines = ['DGO Capital Finance - Exportacion','Moneda: '+CC.code+' ('+CC.symbol+')',''];
@@ -1107,22 +1191,7 @@ function scheduleNotification(timeStr) {
 }
 
 function triggerDailyNotif(timeStr) {
-  var parts = timeStr.split(':');
-  var h = parseInt(parts[0]), m = parseInt(parts[1]);
-  var now = new Date();
-  var target = new Date();
-  target.setHours(h, m, 0, 0);
-  if (target <= now) target.setDate(target.getDate() + 1);
-  var delay = target - now;
-  setTimeout(function() {
-    if (Notification.permission === 'granted') {
-      new Notification('DGO Capital Finance', {
-        body: 'No olvides registrar tus gastos del dia!',
-        icon: 'apple-touch-icon.png'
-      });
-    }
-    triggerDailyNotif(timeStr);
-  }, delay);
+  // Handled entirely by Service Worker - no JS timer to avoid duplicates
 }
 
 document.getElementById('btn-add-month').addEventListener('click', showAddMonth);
@@ -1135,6 +1204,7 @@ document.getElementById('nav-dashboard').addEventListener('click', function(){go
 document.getElementById('nav-ajustes').addEventListener('click', function(){goView('ajustes');});
 document.getElementById('row-currency').addEventListener('click', showCurrencyModal);
 document.getElementById('btn-export').addEventListener('click', exportData);
+document.getElementById('btn-import').addEventListener('click', showImportModal);
 document.getElementById('btn-notif').addEventListener('click', function(){
   var t = document.getElementById('notif-time').value || '21:00';
   scheduleNotification(t);
@@ -1151,9 +1221,7 @@ document.getElementById('notes-ta').addEventListener('input', function(){ DB[cur
 
 loadDB();
 registerSW();
-if (typeof Notification !== 'undefined' && Notification.permission === 'granted' && DB._cfg && DB._cfg.notifTime) {
-  triggerDailyNotif(DB._cfg.notifTime);
-}
+// SW handles background notifications - no JS timer needed
 // Restore saved savePct into input
 var budPctEl = document.getElementById('bud-pct');
 if(budPctEl && DB._cfg && DB._cfg.savePct) {
