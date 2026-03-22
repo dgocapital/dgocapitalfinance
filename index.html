@@ -392,10 +392,12 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
         Meta de ahorro / inversión
       </div>
       <div class="bud-meta-row">
-        <span class="bud-meta-lbl">Porcentaje mínimo de ahorro:</span>
+        <span class="bud-meta-lbl">Meta de ahorro:</span>
         <input class="bud-pct-input" id="bud-pct" type="number" min="1" max="80" value="10"/>
         <span class="bud-meta-lbl">%</span>
+        <button id="btn-save-pct" style="padding:6px 14px;border-radius:20px;border:none;background:var(--accent);color:#fff;font-size:11px;font-weight:500;cursor:pointer;">Guardar</button>
       </div>
+      <div id="pct-saved-msg" style="font-size:11px;color:var(--green);padding:0 0 8px;display:none;">&#10003; Guardado</div>
       <div id="bud-summary"></div>
     </div>
 
@@ -808,12 +810,17 @@ function confirmClear() {
 // Wire up all event listeners safely after DOM is ready
 
 document.getElementById('nav-presupuesto').addEventListener('click', function(){goView('presupuesto');});
-document.getElementById('bud-pct').addEventListener('input', function(){
-  var v = Math.max(1, Math.min(80, parseFloat(this.value)||10));
-  DB._cfg = DB._cfg || {};
+document.getElementById('btn-save-pct').addEventListener('click', function(){
+  var pctEl = document.getElementById('bud-pct');
+  var v = Math.max(1, Math.min(80, parseFloat(pctEl.value)||10));
+  pctEl.value = v;
+  if(!DB._cfg) DB._cfg = {};
   DB._cfg.savePct = v;
   saveDB();
   renderBudget();
+  var msg = document.getElementById('pct-saved-msg');
+  msg.style.display = 'block';
+  setTimeout(function(){ msg.style.display = 'none'; }, 2000);
 });
 
 function renderBudget() {
@@ -892,6 +899,9 @@ function renderBudget() {
 
 document.getElementById('btn-add-month').addEventListener('click', showAddMonth);
 document.getElementById('cur-badge').addEventListener('click', showCurrencyModal);
+document.getElementById('bud-pct').addEventListener('keydown', function(e){
+  if(e.key === 'Enter') document.getElementById('btn-save-pct').click();
+});
 document.getElementById('nav-registro').addEventListener('click', function(){goView('registro');});
 document.getElementById('nav-dashboard').addEventListener('click', function(){goView('dashboard');});
 document.getElementById('nav-ajustes').addEventListener('click', function(){goView('ajustes');});
