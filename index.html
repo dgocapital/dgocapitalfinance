@@ -1110,9 +1110,13 @@ function renderBudget() {
   if(pctEl) pctEl.value = savePct;
 
   var metaAhorro = ingresos * (savePct/100);
+  var invTotal = sum(d.invierto);
 
-  // Maximo = ingresos - meta ahorro - fijos (inversion NO resta, es patrimonio)
-  var maxGasto = Math.max(0, ingresos - metaAhorro - totalFixed);
+  // Maximo = ingresos - max(meta ahorro, lo que ya invertiste) - fijos
+  // Si ya invertiste mas que la meta, se usa lo invertido (ya cumpliste y mas)
+  // Si invertiste menos que la meta, se usa la meta (te falta para llegar)
+  var compromisoAhorro = Math.max(metaAhorro, invTotal);
+  var maxGasto = Math.max(0, ingresos - compromisoAhorro - totalFixed);
 
   var fijosCon = fijos.filter(function(x){return x.sec==='consumo';}).reduce(function(s,x){return s+x.val;},0);
   var comunesCon = comunes.filter(function(x){return x.sec==='consumo';}).reduce(function(s,x){return s+x.val;},0);
@@ -1122,20 +1126,28 @@ function renderBudget() {
   var margen = Math.max(0, maxGasto - gastadoLibre);
   var barColor = pctUsado < 70 ? 'var(--green)' : pctUsado < 90 ? 'var(--amber)' : 'var(--red)';
   var alertClass = pctUsado < 70 ? 'ok' : pctUsado < 90 ? 'warn' : 'danger';
-  var alertMsg = pctUsado < 70
-    ? '&#10003; Vas bien. Te quedan ' + fmtF(margen) + ' de margen libre este mes.'
-    : pctUsado < 90
-    ? '&#9888; Precaucion. Has usado el '+pctUsado+'% de tu presupuesto disponible.'
-    : '&#9888; Alerta. Has superado o estas muy cerca del limite de gasto libre.';
+  var alertMsg;
+  if (invTotal > ingresos) {
+    alertMsg = '&#128994; Este mes invertiste mas de lo que ganaste. Tus gastos libres salen de ahorros anteriores.';
+  } else if (maxGasto === 0) {
+    alertMsg = '&#9888; Entre inversion y gastos fijos no queda margen libre. Revisa tu distribucion.';
+  } else if (pctUsado < 70) {
+    alertMsg = '&#10003; Vas bien. Te quedan ' + fmtF(margen) + ' de margen libre este mes.';
+  } else if (pctUsado < 90) {
+    alertMsg = '&#9888; Precaucion. Has usado el '+pctUsado+'% de tu presupuesto disponible.';
+  } else {
+    alertMsg = '&#9888; Alerta. Has superado o estas muy cerca del limite de gasto libre.';
+  }
 
   document.getElementById('bud-period-lbl').textContent = 'Basado en ' + cur;
 
   var sumEl = document.getElementById('bud-summary');
   sumEl.innerHTML = [
     {l:'Ingresos del mes', sub:'', v:fmtF(ingresos), c:'var(--green)'},
-    {l:'Meta ahorro / inversion ('+savePct+'%)', sub:'Minimo recomendado', v:fmtF(metaAhorro), c:'var(--blue)'},
+    {l:'Meta ahorro ('+savePct+'%)', sub:'Minimo recomendado', v:fmtF(metaAhorro), c:'var(--blue)'},
+    {l:'Lo que ya invertiste', sub:invTotal>=metaAhorro?'Meta superada!':'Aun no alcanzas la meta', v:fmtF(invTotal), c:invTotal>=metaAhorro?'var(--green)':'var(--amber)'},
     {l:'Gastos fijos y comunes', sub:fijos.length+' fijos, '+comunes.length+' comunes', v:fmtF(totalFixed), c:'var(--amber)'},
-    {l:'Maximo disponible para gastar', sub:'Ingresos - ahorro - fijos', v:fmtF(maxGasto), c:maxGasto>0?'var(--green)':'var(--red)'},
+    {l:'Maximo disponible para gastar', sub:'Ingresos - inversion/ahorro - fijos', v:fmtF(maxGasto), c:maxGasto>0?'var(--green)':'var(--red)'},
   ].map(function(r){
     return '<div class="bud-row"><div><div class="bud-lbl">'+r.l+'</div>'+(r.sub?'<div class="bud-lbl-sub">'+r.sub+'</div>':'')+'</div><div class="bud-val" style="color:'+r.c+'">'+r.v+'</div></div>';
   }).join('');
