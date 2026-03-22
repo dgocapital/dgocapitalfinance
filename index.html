@@ -51,9 +51,9 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
 .tb-months::-webkit-scrollbar{display:none;}
 .mpill{flex-shrink:0;font-size:11px;font-weight:500;padding:5px 13px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;}
 .mpill.active{background:var(--accent);color:#fff;border-color:var(--accent);}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:transparent;border:none;color:var(--text3);font-size:8px;letter-spacing:0.3px;text-transform:uppercase;padding:6px 2px;cursor:pointer;min-height:56px;}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:transparent;border:none;color:var(--text3);font-size:7px;letter-spacing:0.2px;text-transform:uppercase;padding:6px 1px;cursor:pointer;min-height:56px;}
 .nav-btn.active{color:var(--accent2);}
-.nav-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.nav-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
 .view{display:none;padding:14px;flex-direction:column;gap:11px;}
 .view.active{display:flex;}
 .hero-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-xl);padding:20px;position:relative;overflow:hidden;}
@@ -190,6 +190,22 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
 .fixed-name{font-size:12px;color:var(--text2);}
 .fixed-val{font-size:12px;font-weight:500;}
 .fixed-tag{font-size:9px;padding:2px 7px;border-radius:20px;font-weight:500;margin-right:6px;}
+
+.ia-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-xl);padding:20px;position:relative;overflow:hidden;}
+.ia-card::before{content:"";position:absolute;top:-40px;right:-40px;width:130px;height:130px;background:var(--accent);opacity:0.06;border-radius:50%;}
+.ia-title{font-family:"Syne",sans-serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.ia-sub{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:18px;}
+.ia-btn{width:100%;padding:14px;border-radius:var(--r);border:none;background:var(--accent);color:#fff;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:"DM Sans",sans-serif;}
+.ia-btn:active{opacity:0.85;}
+.ia-btn svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.ia-months{display:flex;flex-direction:column;gap:8px;}
+.ia-month-btn{padding:12px 14px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:13px;cursor:pointer;text-align:left;display:flex;justify-content:space-between;align-items:center;font-family:"DM Sans",sans-serif;}
+.ia-month-btn:active{border-color:var(--accent);color:var(--accent);}
+.ia-month-btn span{font-size:11px;color:var(--text3);}
+.ia-divider{height:1px;background:var(--border);margin:16px 0;}
+.ia-scope{display:flex;gap:8px;margin-bottom:16px;}
+.ia-scope-btn{flex:1;padding:9px;border-radius:var(--r);border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;font-family:"DM Sans",sans-serif;transition:all 0.15s;}
+.ia-scope-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
 
 .growth-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;overflow:hidden;}
 .growth-title{font-family:"Syne",sans-serif;font-size:13px;font-weight:600;margin-bottom:4px;}
@@ -488,6 +504,45 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
     <div style="height:6px;"></div>
   </div>
 
+  <div class="view" id="view-ia">
+    <div>
+      <div class="dash-title">Análisis con IA</div>
+      <div class="dash-sub">Abre Claude con tus datos listos para analizar</div>
+    </div>
+
+    <div class="ia-card">
+      <div class="ia-title">¿Qué quieres analizar?</div>
+      <div class="ia-sub">Selecciona el alcance y Claude recibirá un resumen completo de tus finanzas con preguntas de análisis ya formuladas.</div>
+      <div class="ia-scope">
+        <button class="ia-scope-btn active" id="scope-mes" >Mes actual</button>
+        <button class="ia-scope-btn" id="scope-todo" >Todo el período</button>
+      </div>
+      <button class="ia-btn" id="btn-analizar">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Abrir en Claude
+      </button>
+    </div>
+
+    <div class="ia-card" style="background:var(--bg3);padding:16px;">
+      <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:600;margin-bottom:10px;">¿Cómo funciona?</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <div style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5;">Toca <b style="color:var(--text);">Abrir en Claude</b> — se abre claude.ai con tus datos financieros ya escritos</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <div style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5;">Inicia sesión en Claude si no lo has hecho</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <div style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5;">Envía el mensaje y recibe tu análisis financiero personalizado</div>
+        </div>
+      </div>
+    </div>
+    <div style="height:6px;"></div>
+  </div>
+
   <div class="view" id="view-ajustes">
     <div>
       <div class="dash-title">Ajustes</div>
@@ -545,6 +600,10 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
   <button class="nav-btn" id="nav-presupuesto">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
     Presupuesto
+  </button>
+  <button class="nav-btn" id="nav-ia">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 8v4l3 3"/></svg>
+    IA
   </button>
   <button class="nav-btn" id="nav-ajustes">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
@@ -619,6 +678,7 @@ function goView(v) {
   if (v==='dashboard') renderDash();
   if (v==='ajustes') renderSettings();
   if (v==='presupuesto') renderBudget();
+  if (v==='ia') { var sm=document.getElementById('scope-mes'); if(sm) setScope(iaScope); }
 }
 
 function renderPills() {
@@ -1271,12 +1331,101 @@ function triggerDailyNotif(timeStr) {
   // Handled entirely by Service Worker - no JS timer to avoid duplicates
 }
 
+
+var iaScope = 'mes';
+
+function setScope(s) {
+  iaScope = s;
+  document.getElementById('scope-mes').className = 'ia-scope-btn' + (s==='mes'?' active':'');
+  document.getElementById('scope-todo').className = 'ia-scope-btn' + (s==='todo'?' active':'');
+}
+
+function buildAnalysisPrompt(scope) {
+  var keys = mkeys();
+  if (!keys.length) return null;
+
+  var targetKeys = scope === 'mes' ? [cur] : keys;
+  var moneda = CC.code;
+  var sym = CC.symbol;
+
+  var lines = [];
+  lines.push('Hola Claude! Te comparto mis datos financieros personales de DGO Capital Finance para que me hagas un análisis detallado.');
+  lines.push('');
+  lines.push('MONEDA: ' + moneda);
+  lines.push('');
+
+  targetKeys.forEach(function(k) {
+    var d = DB[k];
+    var g = sum(d.gano), de = sum(d.debo), inv = sum(d.invierto), con = sum(d.consumo);
+    var bg = g - de + inv - con;
+    lines.push('=== ' + k + ' ===');
+    lines.push('Ingresos: ' + sym + Math.round(g).toLocaleString('es-CO'));
+    if (d.gano.length) d.gano.forEach(function(it){ lines.push('  - ' + it.desc + ': ' + sym + Math.round(it.val).toLocaleString('es-CO')); });
+    lines.push('Deudas: ' + sym + Math.round(de).toLocaleString('es-CO'));
+    if (d.debo.length) d.debo.forEach(function(it){ lines.push('  - ' + it.desc + ': ' + sym + Math.round(it.val).toLocaleString('es-CO') + (it.tipo&&it.tipo!=='normal'?' ['+it.tipo+']':'')); });
+    lines.push('Inversiones/Ahorros: ' + sym + Math.round(inv).toLocaleString('es-CO'));
+    if (d.invierto.length) d.invierto.forEach(function(it){ lines.push('  - ' + it.desc + ': ' + sym + Math.round(it.val).toLocaleString('es-CO')); });
+    lines.push('Gastos de consumo: ' + sym + Math.round(con).toLocaleString('es-CO'));
+    if (d.consumo.length) d.consumo.forEach(function(it){ lines.push('  - ' + it.desc + ': ' + sym + Math.round(it.val).toLocaleString('es-CO') + (it.tipo&&it.tipo!=='normal'?' ['+it.tipo+']':'')); });
+    lines.push('Balance general: ' + sym + Math.round(bg).toLocaleString('es-CO'));
+    if (d.notes) lines.push('Notas: ' + d.notes);
+    lines.push('');
+  });
+
+  lines.push('Por favor analiza mis finanzas y dime:');
+  lines.push('1. ¿Cómo está mi situación financiera general?');
+  lines.push('2. ¿En qué estoy gastando demasiado?');
+  lines.push('3. ¿Cómo está mi nivel de ahorro e inversión?');
+  if (scope === 'todo' && keys.length > 1) {
+    lines.push('4. ¿Cuál es mi tendencia mes a mes? ¿Estoy mejorando?');
+    lines.push('5. ¿Qué recomendaciones concretas me das para optimizar mis finanzas?');
+  } else {
+    lines.push('4. ¿Qué recomendaciones concretas me das para este mes?');
+  }
+
+  return lines.join('\n');
+}
+
+function abrirEnClaude() {
+  var keys = mkeys();
+  if (!keys.length) {
+    alert('No tienes datos registrados aún.');
+    return;
+  }
+  var prompt = buildAnalysisPrompt(iaScope);
+  if (!prompt) return;
+
+  // Try to open claude.ai with the message pre-filled
+  var encoded = encodeURIComponent(prompt);
+  var url = 'https://claude.ai/new?q=' + encoded;
+
+  // If URL is too long (>2000 chars), copy to clipboard and open claude.ai
+  if (url.length > 2000) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(prompt).then(function() {
+        window.open('https://claude.ai/new', '_blank');
+        setTimeout(function() {
+          alert('El mensaje fue copiado al portapapeles. Pégalo en Claude con Cmd+V o mantén presionado y selecciona Pegar.');
+        }, 500);
+      });
+    } else {
+      window.open('https://claude.ai/new', '_blank');
+    }
+  } else {
+    window.open(url, '_blank');
+  }
+}
+
 document.getElementById('btn-add-month').addEventListener('click', showAddMonth);
 document.getElementById('cur-badge').addEventListener('click', showCurrencyModal);
 document.getElementById('bud-pct').addEventListener('keydown', function(e){
   if(e.key === 'Enter') document.getElementById('btn-save-pct').click();
 });
 document.getElementById('nav-registro').addEventListener('click', function(){goView('registro');});
+document.getElementById('nav-ia').addEventListener('click', function(){goView('ia');});
+document.getElementById('btn-analizar').addEventListener('click', abrirEnClaude);
+document.getElementById('scope-mes').addEventListener('click', function(){ setScope('mes'); });
+document.getElementById('scope-todo').addEventListener('click', function(){ setScope('todo'); });
 document.getElementById('nav-dashboard').addEventListener('click', function(){goView('dashboard');});
 document.getElementById('nav-ajustes').addEventListener('click', function(){goView('ajustes');});
 document.getElementById('row-currency').addEventListener('click', showCurrencyModal);
