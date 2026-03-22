@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="theme-color" content="#0a0a12"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="DGO Capital"/>
+<title>DGO Capital — Finance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0a0a12;--bg2:#111120;--bg3:#16162a;--bg4:#1e1e36;
+  --border:#2a2a48;--text:#e8e8f4;--text2:#9898b8;--text3:#5a5a7a;
+  --accent:#7c6ef0;--accent2:#a897ff;--accent-dim:#2a2450;
+  --green:#22c48a;--green-dim:#0f3323;--green-soft:#1a4a33;
+  --red:#f05a5a;--red-dim:#3a1515;--red-soft:#4a2020;
+  --blue:#5ab4f0;--blue-soft:#1a3850;
+  --amber:#f0a832;--amber-soft:#4a3510;
+  --r-sm:10px;--r:16px;--r-lg:22px;--r-xl:28px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);font-family:"DM Sans",sans-serif;color:var(--text);overflow:hidden;}
+button,input,textarea,select{font-family:"DM Sans",sans-serif;}
+input:focus,textarea:focus,select:focus,button:focus{outline:none;}
+#root{display:flex;flex-direction:column;height:100vh;max-width:430px;margin:0 auto;background:var(--bg);position:relative;overflow:hidden;}
+#topbar{flex-shrink:0;background:var(--bg);padding:52px 20px 10px;border-bottom:1px solid var(--border);}
+#content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+#content::-webkit-scrollbar{display:none;}
+#navbar{flex-shrink:0;background:var(--bg2);border-top:1px solid var(--border);display:flex;padding:10px 0 20px;}
+.tb-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.tb-logo{display:flex;align-items:center;gap:10px;}
+.tb-mark{width:32px;height:32px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;}
+.tb-mark svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.tb-name{font-family:"Syne",sans-serif;font-size:17px;font-weight:700;letter-spacing:-0.3px;}
+.tb-sub{font-size:9px;color:var(--accent2);letter-spacing:2px;text-transform:uppercase;}
+.tb-actions{display:flex;gap:6px;align-items:center;}
+.add-month-btn{font-size:11px;padding:6px 13px;border-radius:20px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-weight:500;cursor:pointer;}
+.add-month-btn:active{background:var(--accent);color:#fff;}
+.currency-badge{font-size:11px;padding:5px 10px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;font-weight:500;}
+.tb-months{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;}
+.tb-months::-webkit-scrollbar{display:none;}
+.mpill{flex-shrink:0;font-size:11px;font-weight:500;padding:5px 13px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;}
+.mpill.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:transparent;border:none;color:var(--text3);font-size:9px;letter-spacing:0.5px;text-transform:uppercase;padding:6px 0;cursor:pointer;}
+.nav-btn.active{color:var(--accent2);}
+.nav-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.view{display:none;padding:14px;flex-direction:column;gap:11px;}
+.view.active{display:flex;}
+.hero-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-xl);padding:20px;position:relative;overflow:hidden;}
+.hero-card::before{content:"";position:absolute;top:-50px;right:-50px;width:160px;height:160px;background:var(--accent);opacity:0.05;border-radius:50%;}
+.hero-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.hero-amount{font-family:"Syne",sans-serif;font-size:34px;font-weight:700;letter-spacing:-1px;}
+.hero-amount.pos{color:var(--green);}
+.hero-amount.neg{color:var(--red);}
+.hero-month-lbl{font-size:11px;color:var(--text3);margin-top:3px;}
+.hdivider{height:1px;background:var(--border);margin:14px 0;}
+.hstats{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.hstat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;}
+.hstat-val{font-size:14px;font-weight:500;}
+.section{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;}
+.sec-hd{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;cursor:pointer;}
+.sec-hd:active{background:var(--bg4);}
+.sec-hd-left{display:flex;align-items:center;gap:10px;}
+.sec-ico{width:33px;height:33px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sec-ico svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.sec-name{font-family:"Syne",sans-serif;font-size:13px;font-weight:600;}
+.sec-sub{font-size:10px;margin-top:1px;}
+.sec-right{display:flex;align-items:center;gap:8px;}
+.sec-tot{font-size:13px;font-weight:500;}
+.chev{font-size:9px;color:var(--text3);transition:transform 0.2s;display:inline-block;}
+.chev.open{transform:rotate(180deg);}
+.sec-body{border-top:1px solid var(--border);}
+.items-wrap{padding:3px 0;}
+.irow{display:flex;align-items:center;gap:8px;padding:7px 13px;}
+.irow:active{background:var(--bg4);}
+.iname{flex:1;font-size:12px;color:var(--text2);}
+.ival{font-size:12px;font-weight:500;white-space:nowrap;}
+.idel{font-size:17px;color:var(--text3);padding:0 3px;line-height:1;background:none;border:none;cursor:pointer;}
+.idel:active{color:var(--red);}
+.empty-msg{font-size:11px;color:var(--text3);padding:7px 13px;font-style:italic;}
+.add-form{display:flex;gap:6px;padding:8px 11px 11px;}
+.inp-d{flex:2;font-size:12px;padding:8px 10px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);min-width:0;}
+.inp-d::placeholder,.inp-v::placeholder{color:var(--text3);}
+.inp-d:focus{border-color:var(--accent);}
+.inp-v{flex:1;font-size:12px;padding:8px 10px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);min-width:0;}
+.inp-v:focus{border-color:var(--accent);}
+.btn-plus{width:36px;height:36px;border-radius:var(--r-sm);border:none;font-size:20px;font-weight:300;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.btn-plus:active{opacity:0.7;}
+.notes-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;}
+.notes-hd{padding:12px 15px;font-family:"Syne",sans-serif;font-size:13px;font-weight:600;border-bottom:1px solid var(--border);}
+.notes-ta{width:100%;min-height:65px;background:transparent;border:none;padding:10px 15px;font-size:12px;color:var(--text2);resize:none;line-height:1.6;}
+.notes-ta::placeholder{color:var(--text3);}
+.dash-title{font-family:"Syne",sans-serif;font-size:18px;font-weight:700;margin-bottom:3px;}
+.dash-sub{font-size:12px;color:var(--text3);}
+.period-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-xl);padding:18px;}
+.period-main-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.period-main-val{font-family:"Syne",sans-serif;font-size:28px;font-weight:700;letter-spacing:-0.5px;}
+.period-main-val.pos{color:var(--green);}
+.period-main-val.neg{color:var(--red);}
+.period-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;}
+.pgstat{background:var(--bg2);border-radius:var(--r);padding:12px;}
+.pgstat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;}
+.pgstat-val{font-size:15px;font-weight:500;font-family:"Syne",sans-serif;}
+.pgstat-sub{font-size:10px;color:var(--text3);margin-top:2px;}
+.chart-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;}
+.chart-title{font-family:"Syne",sans-serif;font-size:13px;font-weight:600;margin-bottom:14px;}
+.bar-chart{display:flex;flex-direction:column;gap:9px;}
+.bar-row{display:flex;align-items:center;gap:8px;}
+.bar-lbl{font-size:10px;color:var(--text3);width:54px;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bar-track{flex:1;height:8px;background:var(--bg2);border-radius:4px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:4px;transition:width 0.5s ease;}
+.bar-val{font-size:10px;font-weight:500;min-width:48px;text-align:right;flex-shrink:0;}
+.months-table{width:100%;border-collapse:collapse;font-size:11px;}
+.months-table th{color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;padding:6px 8px;text-align:left;border-bottom:1px solid var(--border);font-size:10px;}
+.months-table td{padding:8px;border-bottom:1px solid var(--border);color:var(--text2);}
+.months-table tr:last-child td{border-bottom:none;}
+.months-table td:first-child{color:var(--text);font-weight:500;}
+.badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;}
+.badge-pos{background:var(--green-dim);color:var(--green);}
+.badge-neg{background:var(--red-dim);color:var(--red);}
+.ti-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);}
+.ti-row:last-child{border-bottom:none;}
+.ti-name{font-size:12px;color:var(--text2);}
+.ti-val{font-size:12px;font-weight:500;color:var(--amber);}
+.empty-dash{text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;}
+.set-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;}
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:14px 15px;border-bottom:1px solid var(--border);}
+.set-row:last-child{border-bottom:none;}
+.set-label{font-size:13px;}
+.set-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.set-btn{font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;}
+.danger-btn{width:100%;padding:13px;border-radius:var(--r);border:1px solid var(--red-soft);background:transparent;color:var(--red);font-size:13px;cursor:pointer;}
+.install-card{background:var(--accent-dim);border:1px solid var(--accent);border-radius:var(--r-lg);padding:16px;}
+.install-title{font-family:"Syne",sans-serif;font-size:14px;font-weight:700;color:var(--accent2);margin-bottom:10px;}
+.install-steps{display:flex;flex-direction:column;gap:8px;}
+.install-step{display:flex;gap:10px;align-items:flex-start;}
+.step-num{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.step-txt{font-size:12px;color:var(--text2);line-height:1.5;}
+.storage-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;display:flex;flex-direction:column;gap:10px;}
+.storage-item{display:flex;gap:10px;align-items:flex-start;}
+.storage-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.storage-txt{font-size:12px;color:var(--text2);line-height:1.5;}
+.storage-txt b{color:var(--text);font-weight:500;}
+.sect-lbl{font-family:"Syne",sans-serif;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin:4px 0 2px;}
+.modal-bg{position:absolute;inset:0;background:rgba(0,0,0,0.72);display:flex;align-items:flex-end;z-index:50;}
+.modal-box{background:var(--bg2);border-radius:var(--r-xl) var(--r-xl) 0 0;padding:24px 20px 36px;width:100%;border:1px solid var(--border);border-bottom:none;}
+.modal-box h3{font-family:"Syne",sans-serif;font-size:16px;font-weight:700;margin-bottom:18px;}
+.modal-inp{width:100%;font-size:14px;padding:11px 13px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg3);color:var(--text);margin-bottom:12px;}
+.modal-inp:focus{border-color:var(--accent);}
+.mbtns{display:flex;gap:8px;}
+.mbtn-c{flex:1;padding:11px;border-radius:var(--r);border:1px solid var(--border);background:transparent;color:var(--text2);font-size:14px;cursor:pointer;}
+.mbtn-ok{flex:1;padding:11px;border-radius:var(--r);border:none;background:var(--accent);color:#fff;font-size:14px;font-weight:500;cursor:pointer;}
+.cur-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.cur-opt{padding:12px 6px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;cursor:pointer;text-align:center;}
+.cur-opt.sel{border-color:var(--accent);background:var(--accent-dim);color:var(--accent2);}
+.cur-sym{font-family:"Syne",sans-serif;font-size:15px;font-weight:700;display:block;margin-bottom:2px;}
+.cur-nm{font-size:9px;color:var(--text3);display:block;}
+.cur-opt.sel .cur-nm{color:var(--accent);}
+</style>
+</head>
+<body>
+<div id="root">
+
+<div id="topbar">
+  <div class="tb-top">
+    <div class="tb-logo">
+      <div class="tb-mark">
+        <svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+      </div>
+      <div>
+        <div class="tb-name">DGO Capital</div>
+        <div class="tb-sub">Finance</div>
+      </div>
+    </div>
+    <div class="tb-actions">
+      <button class="currency-badge" id="cur-badge">COP</button>
+      <button class="add-month-btn" id="btn-add-month">+ Mes</button>
+    </div>
+  </div>
+  <div class="tb-months" id="tb-months"></div>
+</div>
+
+<div id="content">
+
+  <div class="view active" id="view-registro">
+    <div class="hero-card">
+      <div class="hero-label">Balance general del mes</div>
+      <div class="hero-amount" id="hero-amount">$ 0</div>
+      <div class="hero-month-lbl" id="hero-month">—</div>
+      <div class="hdivider"></div>
+      <div class="hstats">
+        <div><div class="hstat-label">Gano</div><div class="hstat-val" style="color:var(--green)" id="hs-gano">$ 0</div></div>
+        <div><div class="hstat-label">Debo</div><div class="hstat-val" style="color:var(--red)" id="hs-debo">$ 0</div></div>
+        <div><div class="hstat-label">Invierto</div><div class="hstat-val" style="color:var(--blue)" id="hs-inv">$ 0</div></div>
+        <div><div class="hstat-label">Consumo</div><div class="hstat-val" style="color:var(--amber)" id="hs-con">$ 0</div></div>
+      </div>
+    </div>
+
+    <div class="section" id="sec-gano">
+      <div class="sec-hd" id="hd-gano">
+        <div class="sec-hd-left">
+          <div class="sec-ico" style="background:var(--green-soft);color:var(--green);">
+            <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          </div>
+          <div><div class="sec-name">Lo que gano</div><div class="sec-sub" style="color:var(--green)">Ingresos del mes</div></div>
+        </div>
+        <div class="sec-right">
+          <span class="sec-tot" style="color:var(--green)" id="stot-gano">$ 0</span>
+          <span class="chev open" id="chev-gano">&#9660;</span>
+        </div>
+      </div>
+      <div class="sec-body" id="secbody-gano">
+        <div class="items-wrap" id="list-gano"></div>
+        <div class="empty-msg" id="empty-gano">Sin ingresos aun</div>
+        <div class="add-form">
+          <input class="inp-d" id="d-gano" placeholder="Descripcion"/>
+          <input class="inp-v" id="v-gano" type="number" placeholder="Valor"/>
+          <button class="btn-plus" id="btn-gano" style="background:var(--green);color:#fff;">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="sec-debo">
+      <div class="sec-hd" id="hd-debo">
+        <div class="sec-hd-left">
+          <div class="sec-ico" style="background:var(--red-soft);color:var(--red);">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div><div class="sec-name">Lo que debo</div><div class="sec-sub" style="color:var(--red)">Deudas y obligaciones</div></div>
+        </div>
+        <div class="sec-right">
+          <span class="sec-tot" style="color:var(--red)" id="stot-debo">$ 0</span>
+          <span class="chev open" id="chev-debo">&#9660;</span>
+        </div>
+      </div>
+      <div class="sec-body" id="secbody-debo">
+        <div class="items-wrap" id="list-debo"></div>
+        <div class="empty-msg" id="empty-debo">Sin deudas registradas</div>
+        <div class="add-form">
+          <input class="inp-d" id="d-debo" placeholder="Descripcion"/>
+          <input class="inp-v" id="v-debo" type="number" placeholder="Valor"/>
+          <button class="btn-plus" id="btn-debo" style="background:var(--red);color:#fff;">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="sec-invierto">
+      <div class="sec-hd" id="hd-invierto">
+        <div class="sec-hd-left">
+          <div class="sec-ico" style="background:var(--blue-soft);color:var(--blue);">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div><div class="sec-name">Lo que invierto</div><div class="sec-sub" style="color:var(--blue)">Ahorro e inversiones</div></div>
+        </div>
+        <div class="sec-right">
+          <span class="sec-tot" style="color:var(--blue)" id="stot-invierto">$ 0</span>
+          <span class="chev open" id="chev-invierto">&#9660;</span>
+        </div>
+      </div>
+      <div class="sec-body" id="secbody-invierto">
+        <div class="items-wrap" id="list-invierto"></div>
+        <div class="empty-msg" id="empty-invierto">Sin inversiones registradas</div>
+        <div class="add-form">
+          <input class="inp-d" id="d-invierto" placeholder="Descripcion"/>
+          <input class="inp-v" id="v-invierto" type="number" placeholder="Valor"/>
+          <button class="btn-plus" id="btn-invierto" style="background:var(--blue);color:#fff;">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="sec-consumo">
+      <div class="sec-hd" id="hd-consumo">
+        <div class="sec-hd-left">
+          <div class="sec-ico" style="background:var(--amber-soft);color:var(--amber);">
+            <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          </div>
+          <div><div class="sec-name">Lo que consumo</div><div class="sec-sub" style="color:var(--amber)">Gastos del mes</div></div>
+        </div>
+        <div class="sec-right">
+          <span class="sec-tot" style="color:var(--amber)" id="stot-consumo">$ 0</span>
+          <span class="chev open" id="chev-consumo">&#9660;</span>
+        </div>
+      </div>
+      <div class="sec-body" id="secbody-consumo">
+        <div class="items-wrap" id="list-consumo"></div>
+        <div class="empty-msg" id="empty-consumo">Sin gastos registrados</div>
+        <div class="add-form">
+          <input class="inp-d" id="d-consumo" placeholder="Descripcion"/>
+          <input class="inp-v" id="v-consumo" type="number" placeholder="Valor"/>
+          <button class="btn-plus" id="btn-consumo" style="background:var(--amber);color:#fff;">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes-card">
+      <div class="notes-hd">Notas del mes</div>
+      <textarea class="notes-ta" id="notes-ta" placeholder="Observaciones, metas, recordatorios..."></textarea>
+    </div>
+    <div style="height:6px;"></div>
+  </div>
+
+  <div class="view" id="view-dashboard">
+    <div>
+      <div class="dash-title">Control financiero</div>
+      <div class="dash-sub" id="dash-period">Periodo completo</div>
+    </div>
+    <div id="dash-empty" class="empty-dash" style="display:none;">
+      <div style="font-size:32px;margin-bottom:10px;">&#128202;</div>
+      Registra al menos un mes para ver tu analisis
+    </div>
+    <div id="dash-content" style="display:flex;flex-direction:column;gap:11px;">
+      <div class="period-card">
+        <div class="period-main-lbl">Acumulado total</div>
+        <div class="period-main-val" id="d-bg-total">$ 0</div>
+        <div class="period-grid">
+          <div class="pgstat"><div class="pgstat-label">Total ganado</div><div class="pgstat-val" style="color:var(--green)" id="d-tot-gano">$ 0</div><div class="pgstat-sub" id="d-avg-gano">Prom: $ 0/mes</div></div>
+          <div class="pgstat"><div class="pgstat-label">Total deudas</div><div class="pgstat-val" style="color:var(--red)" id="d-tot-debo">$ 0</div><div class="pgstat-sub" id="d-avg-debo">Prom: $ 0/mes</div></div>
+          <div class="pgstat"><div class="pgstat-label">Total invertido</div><div class="pgstat-val" style="color:var(--blue)" id="d-tot-inv">$ 0</div><div class="pgstat-sub" id="d-avg-inv">Prom: $ 0/mes</div></div>
+          <div class="pgstat"><div class="pgstat-label">Total consumido</div><div class="pgstat-val" style="color:var(--amber)" id="d-tot-con">$ 0</div><div class="pgstat-sub" id="d-avg-con">Prom: $ 0/mes</div></div>
+        </div>
+      </div>
+      <div class="chart-card"><div class="chart-title">Balance por mes</div><div class="bar-chart" id="bars-balance"></div></div>
+      <div class="chart-card"><div class="chart-title">Distribucion promedio</div><div class="bar-chart" id="bars-dist"></div></div>
+      <div class="chart-card" style="padding:0;overflow:hidden;">
+        <div style="padding:13px 15px;border-bottom:1px solid var(--border);font-family:'Syne',sans-serif;font-size:13px;font-weight:600;">Resumen mensual</div>
+        <table class="months-table"><thead><tr><th>Mes</th><th>Gano</th><th>Consumo</th><th>Balance</th></tr></thead><tbody id="months-tbody"></tbody></table>
+      </div>
+      <div class="chart-card"><div class="chart-title">Top gastos recurrentes</div><div id="top-gastos"></div></div>
+    </div>
+    <div style="height:6px;"></div>
+  </div>
+
+  <div class="view" id="view-ajustes">
+    <div>
+      <div class="dash-title">Ajustes</div>
+      <div class="dash-sub">DGO Capital Finance v1.1</div>
+    </div>
+    <div class="set-card">
+      <div class="set-row" id="row-currency" style="cursor:pointer;">
+        <div>
+          <div class="set-label">Moneda</div>
+          <div class="set-sub" id="set-cur-sub">Pesos colombianos (COP)</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span id="set-cur-symbol" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--accent);">$</span>
+          <span style="color:var(--text3);font-size:14px;">&#8250;</span>
+        </div>
+      </div>
+      <div class="set-row"><div><div class="set-label">Meses registrados</div><div class="set-sub" id="set-months-count">0 meses</div></div></div>
+      <div class="set-row"><div><div class="set-label">Exportar datos</div><div class="set-sub">Comparte o copia todos tus datos</div></div><button class="set-btn" id="btn-export">Exportar</button></div>
+      <div class="set-row"><div><div class="set-label">Version</div><div class="set-sub">DGO Capital Finance v1.1</div></div></div>
+    </div>
+    <div class="sect-lbl">Donde se guardan tus datos</div>
+    <div class="storage-card">
+      <div class="storage-item"><div class="storage-dot" style="background:var(--green);"></div><div class="storage-txt"><b>En tu propio dispositivo.</b> Todo se guarda en localStorage, privado y local en tu celular.</div></div>
+      <div class="storage-item"><div class="storage-dot" style="background:var(--blue);"></div><div class="storage-txt"><b>Sin servidores.</b> DGO Capital no tiene backend. Nadie mas puede ver tus datos.</div></div>
+      <div class="storage-item"><div class="storage-dot" style="background:var(--amber);"></div><div class="storage-txt"><b>Persiste entre sesiones</b> mientras uses el mismo navegador en el mismo dispositivo.</div></div>
+      <div class="storage-item"><div class="storage-dot" style="background:var(--accent);"></div><div class="storage-txt"><b>Haz respaldo</b> usando Exportar para enviarte los datos por WhatsApp o notas.</div></div>
+    </div>
+    <div class="sect-lbl">Instalar en tu celular</div>
+    <div class="install-card">
+      <div class="install-title">Como instalarla</div>
+      <div class="install-steps">
+        <div class="install-step"><div class="step-num">1</div><div class="step-txt">Descarga el archivo HTML y pasalo a tu celular</div></div>
+        <div class="install-step"><div class="step-num">2</div><div class="step-txt"><b>Android:</b> Abre en Chrome &rarr; menu &#8942; &rarr; Agregar a pantalla de inicio</div></div>
+        <div class="install-step"><div class="step-num">3</div><div class="step-txt"><b>iPhone:</b> Abre en Safari &rarr; compartir &#11014; &rarr; Agregar a inicio</div></div>
+        <div class="install-step"><div class="step-num">4</div><div class="step-txt">Listo. Aparece como app y los datos quedan guardados.</div></div>
+      </div>
+    </div>
+    <button class="danger-btn" id="btn-clear">Borrar todos los datos</button>
+    <div style="height:6px;"></div>
+  </div>
+
+</div>
+
+<div id="navbar">
+  <button class="nav-btn active" id="nav-registro">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    Registro
+  </button>
+  <button class="nav-btn" id="nav-dashboard">
+    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    Control
+  </button>
+  <button class="nav-btn" id="nav-ajustes">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    Ajustes
+  </button>
+</div>
+
+</div>
+<script>
+const KEY = 'dgocapital_v1';
+const CURRENCIES = [
+  {code:'COP',symbol:'$',name:'Pesos colombianos',loc:'es-CO',dec:0},
+  {code:'USD',symbol:'US$',name:'Dolar estadounidense',loc:'en-US',dec:2},
+  {code:'EUR',symbol:'\u20ac',name:'Euro',loc:'de-DE',dec:2},
+  {code:'MXN',symbol:'$',name:'Pesos mexicanos',loc:'es-MX',dec:0},
+  {code:'ARS',symbol:'$',name:'Pesos argentinos',loc:'es-AR',dec:0},
+  {code:'CLP',symbol:'$',name:'Pesos chilenos',loc:'es-CL',dec:0},
+  {code:'PEN',symbol:'S/',name:'Sol peruano',loc:'es-PE',dec:2},
+  {code:'BRL',symbol:'R$',name:'Real brasileno',loc:'pt-BR',dec:2},
+  {code:'GBP',symbol:'\u00a3',name:'Libra esterlina',loc:'en-GB',dec:2},
+  {code:'CAD',symbol:'CA$',name:'Dolar canadiense',loc:'en-CA',dec:2},
+  {code:'VES',symbol:'Bs',name:'Bolivar venezolano',loc:'es-VE',dec:2},
+  {code:'CRC',symbol:'\u20a1',name:'Colon costarricense',loc:'es-CR',dec:0}
+];
+const MES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+let DB = {};
+let cur = '';
+let CC = CURRENCIES[0];
+let collapsed = {gano:false,debo:false,invierto:false,consumo:false};
+
+function emptyMonth() { return {gano:[],debo:[],invierto:[],consumo:[],notes:''}; }
+
+function loadDB() {
+  try { var s = localStorage.getItem(KEY); if(s) DB = JSON.parse(s); } catch(e) { DB = {}; }
+  if (!DB._cfg) DB._cfg = {currency:'COP'};
+  CC = CURRENCIES.find(function(c){return c.code===DB._cfg.currency;}) || CURRENCIES[0];
+  var keys = mkeys();
+  if (!keys.length) {
+    var now = new Date();
+    var k = MES[now.getMonth()] + ' ' + now.getFullYear();
+    DB[k] = emptyMonth();
+  }
+  var mk = mkeys();
+  cur = mk[mk.length-1];
+}
+
+function saveDB() { try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch(e) {} }
+
+function mkeys() { return Object.keys(DB).filter(function(k){return k!=='_cfg';}); }
+
+function fmt(n) {
+  if (!n && n!==0) return CC.symbol + '0';
+  var a = Math.abs(n), p = n<0 ? '-' : '';
+  if (a>=1000000) return p + CC.symbol + (a/1000000).toFixed(1) + 'M';
+  if (a>=1000) return p + CC.symbol + Math.round(a/1000) + 'K';
+  return p + CC.symbol + Math.round(a).toLocaleString(CC.loc);
+}
+
+function fmtF(n) {
+  if (!n && n!==0) return CC.symbol + '0';
+  var a = Math.abs(n);
+  var f = CC.dec > 0 ? a.toLocaleString(CC.loc,{minimumFractionDigits:CC.dec,maximumFractionDigits:CC.dec}) : Math.round(a).toLocaleString(CC.loc);
+  return (n<0?'- ':'') + CC.symbol + f;
+}
+
+function sum(arr) { return arr.reduce(function(s,x){return s+(Number(x.val)||0);},0); }
+
+function goView(v) {
+  document.querySelectorAll('.view').forEach(function(e){e.classList.remove('active');});
+  document.querySelectorAll('.nav-btn').forEach(function(e){e.classList.remove('active');});
+  document.getElementById('view-'+v).classList.add('active');
+  document.getElementById('nav-'+v).classList.add('active');
+  document.getElementById('content').scrollTop = 0;
+  if (v==='dashboard') renderDash();
+  if (v==='ajustes') renderSettings();
+}
+
+function renderPills() {
+  var el = document.getElementById('tb-months');
+  var keys = mkeys();
+  el.innerHTML = keys.map(function(k) {
+    return '<button class="mpill' + (k===cur?' active':'') + '" data-k="' + k + '">' + k + '</button>';
+  }).join('');
+  el.querySelectorAll('.mpill').forEach(function(btn){
+    btn.addEventListener('click', function(){switchMonth(this.dataset.k);});
+  });
+  setTimeout(function(){
+    var a = el.querySelector('.mpill.active');
+    if(a) a.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  },50);
+}
+
+function switchMonth(k) { cur = k; renderPills(); renderCurrent(); }
+
+function showAddMonth() {
+  var ex = document.getElementById('mw'); if(ex) ex.remove();
+  var now = new Date();
+  var def = MES[now.getMonth()] + ' ' + now.getFullYear();
+  var div = document.createElement('div');
+  div.className = 'modal-bg'; div.id = 'mw';
+  div.innerHTML = '<div class="modal-box"><h3>Nuevo mes</h3><input class="modal-inp" id="mi" value="' + def + '" placeholder="Ej: Abril 2026"/><div class="mbtns"><button class="mbtn-c" id="mbtn-cancel">Cancelar</button><button class="mbtn-ok" id="mbtn-ok">Crear</button></div></div>';
+  document.getElementById('root').appendChild(div);
+  div.querySelector('#mbtn-cancel').addEventListener('click', closeM);
+  div.querySelector('#mbtn-ok').addEventListener('click', createM);
+  setTimeout(function(){ var i=document.getElementById('mi'); if(i){i.focus();i.select();} },80);
+}
+
+function closeM() { var e=document.getElementById('mw'); if(e) e.remove(); }
+
+function createM() {
+  var inp = document.getElementById('mi');
+  var label = inp ? inp.value.trim() : '';
+  if (!label) return;
+  if (!DB[label]) DB[label] = emptyMonth();
+  cur = label;
+  saveDB(); closeM(); renderPills(); renderCurrent();
+}
+
+function showCurrencyModal() {
+  var ex = document.getElementById('curm'); if(ex) ex.remove();
+  var div = document.createElement('div');
+  div.className = 'modal-bg'; div.id = 'curm';
+  var opts = CURRENCIES.map(function(c){
+    return '<button class="cur-opt' + (c.code===CC.code?' sel':'') + '" data-code="' + c.code + '"><span class="cur-sym">' + c.symbol + '</span><span style="font-size:11px;font-weight:500;">' + c.code + '</span><span class="cur-nm">' + c.name + '</span></button>';
+  }).join('');
+  div.innerHTML = '<div class="modal-box"><h3>Seleccionar moneda</h3><div class="cur-grid">' + opts + '</div><div class="mbtns"><button class="mbtn-c" style="flex:1" id="cur-close">Cerrar</button></div></div>';
+  document.getElementById('root').appendChild(div);
+  div.querySelector('#cur-close').addEventListener('click', function(){ var e=document.getElementById('curm'); if(e) e.remove(); });
+  div.querySelectorAll('.cur-opt').forEach(function(btn){
+    btn.addEventListener('click', function(){ setCurrency(this.dataset.code); });
+  });
+}
+
+function setCurrency(code) {
+  CC = CURRENCIES.find(function(c){return c.code===code;}) || CURRENCIES[0];
+  DB._cfg = DB._cfg || {};
+  DB._cfg.currency = code;
+  saveDB();
+  updateCurrencyUI();
+  var e = document.getElementById('curm'); if(e) e.remove();
+  renderCurrent();
+  if (document.getElementById('view-dashboard').classList.contains('active')) renderDash();
+  if (document.getElementById('view-ajustes').classList.contains('active')) renderSettings();
+}
+
+function updateCurrencyUI() {
+  document.getElementById('cur-badge').textContent = CC.code;
+  var sub = document.getElementById('set-cur-sub');
+  if(sub) sub.textContent = CC.name + ' (' + CC.code + ')';
+  var sym = document.getElementById('set-cur-symbol');
+  if(sym) sym.textContent = CC.symbol;
+}
+
+function renderCurrent() {
+  var d = DB[cur] || emptyMonth();
+  var g=sum(d.gano), de=sum(d.debo), inv=sum(d.invierto), con=sum(d.consumo);
+  var bg = g - de - inv - con;
+  var ha = document.getElementById('hero-amount');
+  ha.textContent = fmtF(bg);
+  ha.className = 'hero-amount' + (bg>0?' pos':bg<0?' neg':'');
+  document.getElementById('hero-month').textContent = cur;
+  document.getElementById('hs-gano').textContent = fmt(g);
+  document.getElementById('hs-debo').textContent = fmt(de);
+  document.getElementById('hs-inv').textContent = fmt(inv);
+  document.getElementById('hs-con').textContent = fmt(con);
+  ['gano','debo','invierto','consumo'].forEach(renderSec);
+  document.getElementById('notes-ta').value = d.notes || '';
+}
+
+function renderSec(sec) {
+  var items = DB[cur][sec];
+  var cols = {gano:'var(--green)',debo:'var(--red)',invierto:'var(--blue)',consumo:'var(--amber)'};
+  document.getElementById('empty-'+sec).style.display = items.length ? 'none' : 'block';
+  var list = document.getElementById('list-'+sec);
+  list.innerHTML = '';
+  items.forEach(function(it, i){
+    var row = document.createElement('div');
+    row.className = 'irow';
+    var nm = document.createElement('span'); nm.className='iname'; nm.textContent = it.desc;
+    var vl = document.createElement('span'); vl.className='ival'; vl.style.color=cols[sec]; vl.textContent = fmtF(it.val);
+    var dl = document.createElement('button'); dl.className='idel'; dl.textContent='\u00d7';
+    dl.dataset.sec = sec; dl.dataset.idx = i;
+    dl.addEventListener('click', function(){ delItem(this.dataset.sec, parseInt(this.dataset.idx)); });
+    row.appendChild(nm); row.appendChild(vl); row.appendChild(dl);
+    list.appendChild(row);
+  });
+  document.getElementById('stot-'+sec).textContent = fmt(sum(items));
+  var ids = {gano:'hs-gano',debo:'hs-debo',invierto:'hs-inv',consumo:'hs-con'};
+  var d = DB[cur];
+  document.getElementById(ids[sec]).textContent = fmt(sum(d[sec]));
+  var bg = sum(d.gano)-sum(d.debo)-sum(d.invierto)-sum(d.consumo);
+  var ha = document.getElementById('hero-amount');
+  ha.textContent = fmtF(bg);
+  ha.className = 'hero-amount' + (bg>0?' pos':bg<0?' neg':'');
+}
+
+function addItem(sec) {
+  var d = document.getElementById('d-'+sec);
+  var v = document.getElementById('v-'+sec);
+  var desc = d.value.trim();
+  var val = parseFloat(v.value) || 0;
+  if (!desc) return;
+  DB[cur][sec].push({desc:desc, val:val});
+  d.value = ''; v.value = '';
+  saveDB(); renderSec(sec); d.focus();
+}
+
+function delItem(sec, i) {
+  DB[cur][sec].splice(i,1);
+  saveDB(); renderSec(sec);
+}
+
+function toggleSec(sec) {
+  collapsed[sec] = !collapsed[sec];
+  document.getElementById('secbody-'+sec).style.display = collapsed[sec] ? 'none' : 'block';
+  document.getElementById('chev-'+sec).className = 'chev' + (collapsed[sec] ? '' : ' open');
+}
+
+function renderDash() {
+  var keys = mkeys(); var n = keys.length;
+  document.getElementById('dash-period').textContent = n===0 ? 'Sin datos aun' : n===1 ? '1 mes registrado' : n+' meses - '+keys[0]+' a '+keys[keys.length-1];
+  if (n===0) {
+    document.getElementById('dash-empty').style.display='block';
+    document.getElementById('dash-content').style.display='none';
+    return;
+  }
+  document.getElementById('dash-empty').style.display='none';
+  document.getElementById('dash-content').style.display='flex';
+  var tG=0,tD=0,tI=0,tC=0;
+  keys.forEach(function(k){ var d=DB[k]; tG+=sum(d.gano); tD+=sum(d.debo); tI+=sum(d.invierto); tC+=sum(d.consumo); });
+  var totalBG = tG-tD-tI-tC;
+  var el = document.getElementById('d-bg-total');
+  el.textContent = fmtF(totalBG);
+  el.className = 'period-main-val' + (totalBG>0?' pos':totalBG<0?' neg':'');
+  document.getElementById('d-tot-gano').textContent=fmt(tG); document.getElementById('d-avg-gano').textContent='Prom: '+fmt(tG/n)+'/mes';
+  document.getElementById('d-tot-debo').textContent=fmt(tD); document.getElementById('d-avg-debo').textContent='Prom: '+fmt(tD/n)+'/mes';
+  document.getElementById('d-tot-inv').textContent=fmt(tI); document.getElementById('d-avg-inv').textContent='Prom: '+fmt(tI/n)+'/mes';
+  document.getElementById('d-tot-con').textContent=fmt(tC); document.getElementById('d-avg-con').textContent='Prom: '+fmt(tC/n)+'/mes';
+  var bals = keys.map(function(k){ var d=DB[k]; return {k:k,v:sum(d.gano)-sum(d.debo)-sum(d.invierto)-sum(d.consumo)}; });
+  var maxB = Math.max.apply(null, bals.map(function(x){return Math.abs(x.v);})); maxB = maxB||1;
+  document.getElementById('bars-balance').innerHTML = bals.map(function(b){
+    var pct=Math.round(Math.abs(b.v)/maxB*100), col=b.v>=0?'var(--green)':'var(--red)';
+    var ks = b.k.split(' ')[0].substring(0,3)+' '+b.k.split(' ')[1];
+    return '<div class="bar-row"><div class="bar-lbl" title="'+b.k+'">'+ks+'</div><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:'+col+';"></div></div><div class="bar-val" style="color:'+col+'">'+fmt(b.v)+'</div></div>';
+  }).join('');
+  var cats = [{l:'Ingresos',v:tG/n,c:'var(--green)'},{l:'Inversion',v:tI/n,c:'var(--blue)'},{l:'Consumo',v:tC/n,c:'var(--amber)'},{l:'Deudas',v:tD/n,c:'var(--red)'}];
+  var maxC = Math.max.apply(null, cats.map(function(x){return x.v;})); maxC=maxC||1;
+  document.getElementById('bars-dist').innerHTML = cats.map(function(c){
+    return '<div class="bar-row"><div class="bar-lbl">'+c.l+'</div><div class="bar-track"><div class="bar-fill" style="width:'+Math.round(c.v/maxC*100)+'%;background:'+c.c+';"></div></div><div class="bar-val" style="color:'+c.c+'">'+fmt(c.v)+'</div></div>';
+  }).join('');
+  document.getElementById('months-tbody').innerHTML = keys.slice().reverse().map(function(k){
+    var d=DB[k], g=sum(d.gano), con=sum(d.consumo), bg=g-sum(d.debo)-sum(d.invierto)-con;
+    return '<tr><td>'+k+'</td><td style="color:var(--green)">'+fmt(g)+'</td><td style="color:var(--amber)">'+fmt(con)+'</td><td><span class="badge '+(bg>=0?'badge-pos':'badge-neg')+'">'+fmt(bg)+'</span></td></tr>';
+  }).join('');
+  var gMap = {};
+  keys.forEach(function(k){
+    DB[k].consumo.forEach(function(it){
+      var nm = it.desc.toUpperCase().trim();
+      if(!gMap[nm]) gMap[nm]={name:it.desc,total:0,count:0};
+      gMap[nm].total += Number(it.val)||0; gMap[nm].count++;
+    });
+  });
+  var top = Object.values(gMap).sort(function(a,b){return b.total-a.total;}).slice(0,8);
+  document.getElementById('top-gastos').innerHTML = top.length===0
+    ? '<div style="font-size:12px;color:var(--text3);">Sin gastos aun</div>'
+    : top.map(function(g){ return '<div class="ti-row"><span class="ti-name">'+g.name+' <span style="color:var(--text3);font-size:10px;">(x'+g.count+')</span></span><span class="ti-val">'+fmt(g.total)+'</span></div>'; }).join('');
+}
+
+function renderSettings() {
+  var n = mkeys().length;
+  document.getElementById('set-months-count').textContent = n + (n===1?' mes registrado':' meses registrados');
+  updateCurrencyUI();
+}
+
+function exportData() {
+  var keys = mkeys();
+  var lines = ['DGO Capital Finance - Exportacion','Moneda: '+CC.code+' ('+CC.symbol+')',''];
+  keys.forEach(function(k){
+    var d = DB[k]; lines.push('=== '+k+' ===');
+    lines.push('INGRESOS: '+fmtF(sum(d.gano))); d.gano.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val));});
+    lines.push('DEUDAS: '+fmtF(sum(d.debo))); d.debo.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val));});
+    lines.push('INVERSION: '+fmtF(sum(d.invierto))); d.invierto.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val));});
+    lines.push('CONSUMO: '+fmtF(sum(d.consumo))); d.consumo.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val));});
+    var bg=sum(d.gano)-sum(d.debo)-sum(d.invierto)-sum(d.consumo);
+    lines.push('BALANCE: '+fmtF(bg)); if(d.notes) lines.push('NOTAS: '+d.notes); lines.push('');
+  });
+  var text = lines.join('\n');
+  if (navigator.share) { navigator.share({title:'DGO Capital',text:text}).catch(function(){}); }
+  else if (navigator.clipboard) { navigator.clipboard.writeText(text).then(function(){alert('Datos copiados');}).catch(function(){alert(text);}); }
+  else { alert(text); }
+}
+
+function confirmClear() {
+  if (confirm('Borrar TODOS los datos? No se puede deshacer.')) {
+    localStorage.removeItem(KEY); DB = {};
+    var now = new Date(); var k = MES[now.getMonth()]+' '+now.getFullYear();
+    DB[k] = emptyMonth(); DB._cfg = {currency:'COP'}; CC = CURRENCIES[0];
+    cur = k; saveDB(); updateCurrencyUI(); renderPills(); renderCurrent(); goView('registro');
+  }
+}
+
+// Wire up all event listeners safely after DOM is ready
+document.getElementById('btn-add-month').addEventListener('click', showAddMonth);
+document.getElementById('cur-badge').addEventListener('click', showCurrencyModal);
+document.getElementById('nav-registro').addEventListener('click', function(){goView('registro');});
+document.getElementById('nav-dashboard').addEventListener('click', function(){goView('dashboard');});
+document.getElementById('nav-ajustes').addEventListener('click', function(){goView('ajustes');});
+document.getElementById('row-currency').addEventListener('click', showCurrencyModal);
+document.getElementById('btn-export').addEventListener('click', exportData);
+document.getElementById('btn-clear').addEventListener('click', confirmClear);
+document.getElementById('notes-ta').addEventListener('input', function(){ DB[cur].notes=this.value; saveDB(); });
+
+['gano','debo','invierto','consumo'].forEach(function(sec){
+  document.getElementById('hd-'+sec).addEventListener('click', function(){toggleSec(sec);});
+  document.getElementById('btn-'+sec).addEventListener('click', function(){addItem(sec);});
+  document.getElementById('d-'+sec).addEventListener('keydown', function(e){if(e.key==='Enter')addItem(sec);});
+  document.getElementById('v-'+sec).addEventListener('keydown', function(e){if(e.key==='Enter')addItem(sec);});
+});
+
+loadDB(); updateCurrencyUI(); renderPills(); renderCurrent();
+</script>
+</body>
+</html>
