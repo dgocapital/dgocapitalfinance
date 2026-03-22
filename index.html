@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="DGO Capital"/>
+<link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" sizes="512x512" href="apple-touch-icon.png"/>
 <link rel="icon" type="image/png" href="apple-touch-icon.png"/>
 <!-- DGO Capital Finance v1.3 -->
@@ -1039,6 +1040,27 @@ function renderGrowthChart() {
 }
 
 // Notifications
+// Register Service Worker
+function registerSW() {
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.register('sw.js').then(function(reg) {
+    console.log('SW registered');
+    // If notif time saved, resend schedule to SW
+    if (DB._cfg && DB._cfg.notifTime && Notification.permission === 'granted') {
+      sendScheduleToSW(DB._cfg.notifTime);
+    }
+  }).catch(function(err) {
+    console.log('SW error:', err);
+  });
+}
+
+function sendScheduleToSW(timeStr) {
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.ready.then(function(reg) {
+    reg.active && reg.active.postMessage({type: 'SCHEDULE_NOTIF', time: timeStr});
+  });
+}
+
 function initNotification() {
   var saved = DB._cfg && DB._cfg.notifTime;
   var timeEl = document.getElementById('notif-time');
@@ -1070,14 +1092,17 @@ function scheduleNotification(timeStr) {
   }
   Notification.requestPermission().then(function(perm) {
     if (perm !== 'granted') {
-      showNotifStatus('Permiso de notificaciones denegado', 'err');
+      showNotifStatus('Permiso denegado. Ve a Ajustes del celular y activa notificaciones para esta app.', 'err');
       return;
     }
     if (!DB._cfg) DB._cfg = {};
     DB._cfg.notifTime = timeStr;
     saveDB();
-    showNotifStatus('Recordatorio activo a las ' + timeStr + ' cada dia', 'ok');
+    // Send to Service Worker for background delivery
+    sendScheduleToSW(timeStr);
+    // Also keep JS timer as fallback when app is open
     triggerDailyNotif(timeStr);
+    showNotifStatus('Recordatorio activo a las ' + timeStr + '. Funciona en segundo plano.', 'ok');
   });
 }
 
@@ -1093,8 +1118,7 @@ function triggerDailyNotif(timeStr) {
     if (Notification.permission === 'granted') {
       new Notification('DGO Capital Finance', {
         body: 'No olvides registrar tus gastos del dia!',
-        icon: 'apple-touch-icon.png',
-        badge: 'apple-touch-icon.png'
+        icon: 'apple-touch-icon.png'
       });
     }
     triggerDailyNotif(timeStr);
@@ -1126,6 +1150,7 @@ document.getElementById('notes-ta').addEventListener('input', function(){ DB[cur
 });
 
 loadDB();
+registerSW();
 if (typeof Notification !== 'undefined' && Notification.permission === 'granted' && DB._cfg && DB._cfg.notifTime) {
   triggerDailyNotif(DB._cfg.notifTime);
 }
