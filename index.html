@@ -851,17 +851,20 @@ function renderBudget() {
 
   // Disponible card
   var dispEl = document.getElementById('bud-disponible');
-  var barColor = pctUsado < 70 ? 'var(--green)' : pctUsado < 90 ? 'var(--amber)' : 'var(--red)';
-  var alertClass = pctUsado < 70 ? 'ok' : pctUsado < 90 ? 'warn' : 'danger';
-  var alertMsg = pctUsado < 70
-    ? '&#10003; Vas bien. Te quedan ' + fmtF(Math.max(0,disponible - gastadoLibre)) + ' de margen libre este mes.'
-    : pctUsado < 90
-    ? '&#9888; Precaucion. Has usado el '+pctUsado+'% de tu presupuesto disponible.'
+  var pctUsado2 = maxGasto > 0 ? Math.min(100, Math.round(gastadoLibre/maxGasto*100)) : 0;
+  var barColor = pctUsado2 < 70 ? 'var(--green)' : pctUsado2 < 90 ? 'var(--amber)' : 'var(--red)';
+  var alertClass = pctUsado2 < 70 ? 'ok' : pctUsado2 < 90 ? 'warn' : 'danger';
+  var margen = Math.max(0, maxGasto - gastadoLibre);
+  var alertMsg = pctUsado2 < 70
+    ? '&#10003; Vas bien. Te quedan ' + fmtF(margen) + ' de margen libre este mes.'
+    : pctUsado2 < 90
+    ? '&#9888; Precaucion. Has usado el '+pctUsado2+'% de tu presupuesto disponible.'
     : '&#9888; Alerta. Has superado o estas muy cerca del limite de gasto libre.';
 
+  var maxGasto = Math.max(0, ingresos - metaAhorro - totalFixed);
   dispEl.innerHTML = '<div class="bud-bar-wrap">'
-    + '<div class="bud-bar-lbl"><span>Gastado libre: '+fmtF(gastadoLibre)+'</span><span>Maximo: '+fmtF(Math.max(0,disponible))+'</span></div>'
-    + '<div class="bud-bar-track"><div class="bud-bar-fill" style="width:'+Math.min(100,pctUsado)+'%;background:'+barColor+';"></div></div>'
+    + '<div class="bud-bar-lbl"><span>Gastado libre: '+fmtF(gastadoLibre)+'</span><span>Maximo: '+fmtF(maxGasto)+'</span></div>'
+    + '<div class="bud-bar-track"><div class="bud-bar-fill" style="width:'+Math.min(100,pctUsado2)+'%;background:'+barColor+';"></div></div>'
     + '</div>'
     + '<div class="bud-alert '+alertClass+'">'+alertMsg+'</div>';
 
