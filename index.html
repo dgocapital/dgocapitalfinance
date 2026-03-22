@@ -86,6 +86,8 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
 .iname{flex:1;font-size:12px;color:var(--text2);}
 .ival{font-size:12px;font-weight:500;white-space:nowrap;}
 .idel{font-size:17px;color:var(--text3);padding:0 3px;line-height:1;background:none;border:none;cursor:pointer;}
+.iedit{font-size:13px;color:var(--text3);padding:0 4px;line-height:1;background:none;border:none;cursor:pointer;opacity:0.6;}
+.iedit:active{color:var(--accent2);opacity:1;}
 .idel:active{color:var(--red);}
 .empty-msg{font-size:11px;color:var(--text3);padding:7px 13px;font-style:italic;}
 .add-form{display:flex;gap:6px;padding:8px 11px 11px;}
@@ -727,10 +729,13 @@ function renderSec(sec) {
     else if(it.tipo==='comun') tag='<span class="tag-comun">Comun</span>';
     nm.innerHTML = it.desc + tag;
     var vl = document.createElement('span'); vl.className='ival'; vl.style.color=cols[sec]; vl.textContent = fmtF(it.val);
+    var ed = document.createElement('button'); ed.className='iedit'; ed.textContent='✎';
+    ed.dataset.sec = sec; ed.dataset.idx = i;
+    ed.addEventListener('click', function(e){ e.stopPropagation(); openEditModal(this.dataset.sec, parseInt(this.dataset.idx)); });
     var dl = document.createElement('button'); dl.className='idel'; dl.textContent='\u00d7';
     dl.dataset.sec = sec; dl.dataset.idx = i;
     dl.addEventListener('click', function(){ delItem(this.dataset.sec, parseInt(this.dataset.idx)); });
-    row.appendChild(nm); row.appendChild(vl); row.appendChild(dl);
+    row.appendChild(nm); row.appendChild(vl); row.appendChild(ed); row.appendChild(dl);
     list.appendChild(row);
   });
   document.getElementById('stot-'+sec).textContent = fmt(sum(items));
@@ -823,6 +828,54 @@ function renderSettings() {
   document.getElementById('set-months-count').textContent = n + (n===1?' mes registrado':' meses registrados');
   updateCurrencyUI();
   initNotification();
+}
+
+function openEditModal(sec, idx) {
+  var it = DB[cur][sec][idx];
+  if (!it) return;
+  var ex = document.getElementById('edit-modal'); if(ex) ex.remove();
+  var secNames = {gano:'Lo que gano', debo:'Lo que debo', invierto:'Lo que invierto', consumo:'Lo que consumo'};
+  var div = document.createElement('div');
+  div.className = 'modal-bg'; div.id = 'edit-modal';
+  div.innerHTML = '<div class="modal-box">'
+    + '<h3>Editar ítem</h3>'
+    + '<div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">' + secNames[sec] + '</div>'
+    + '<label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;">Descripción</label>'
+    + '<input class="modal-inp" id="edit-desc" value="' + it.desc.replace(/"/g,"&quot;") + '" placeholder="Descripción"/>'
+    + '<label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;">Valor</label>'
+    + '<input class="modal-inp" id="edit-val" type="number" value="' + it.val + '" placeholder="Valor"/>'
+    + '<label style="font-size:11px;color:var(--text2);display:block;margin-bottom:4px;">Tipo</label>'
+    + '<select id="edit-tipo" style="width:100%;font-size:13px;padding:11px 13px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg3);color:var(--text);margin-bottom:12px;">'
+    + '<option value="normal"' + (it.tipo==='normal'||!it.tipo?' selected':'') + '>Normal</option>'
+    + '<option value="fijo"' + (it.tipo==='fijo'?' selected':'') + '>🔒 Fijo</option>'
+    + '<option value="comun"' + (it.tipo==='comun'?' selected':'') + '>🔄 Común</option>'
+    + '</select>'
+    + '<div class="mbtns">'
+    + '<button class="mbtn-c" id="edit-cancel">Cancelar</button>'
+    + '<button class="mbtn-ok" id="edit-save">Guardar</button>'
+    + '</div></div>';
+  document.body.appendChild(div);
+  div.querySelector('#edit-cancel').addEventListener('click', function(){ div.remove(); });
+  div.querySelector('#edit-save').addEventListener('click', function(){ saveEdit(sec, idx); });
+  div.querySelector('#edit-desc').addEventListener('keydown', function(e){ if(e.key==='Enter') saveEdit(sec,idx); });
+  div.querySelector('#edit-val').addEventListener('keydown', function(e){ if(e.key==='Enter') saveEdit(sec,idx); });
+  setTimeout(function(){ var d=document.getElementById('edit-desc'); if(d){d.focus();d.select();} }, 80);
+}
+
+function saveEdit(sec, idx) {
+  var descEl = document.getElementById('edit-desc');
+  var valEl = document.getElementById('edit-val');
+  var tipoEl = document.getElementById('edit-tipo');
+  var desc = descEl ? descEl.value.trim() : '';
+  var val = parseFloat(valEl ? valEl.value : 0) || 0;
+  var tipo = tipoEl ? tipoEl.value : 'normal';
+  if (!desc) return;
+  DB[cur][sec][idx] = {desc:desc, val:val, tipo:tipo};
+  saveDB();
+  var modal = document.getElementById('edit-modal');
+  if (modal) modal.remove();
+  renderSec(sec);
+  renderBudget();
 }
 
 function showImportModal() {
