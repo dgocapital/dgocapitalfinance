@@ -807,9 +807,8 @@ document.getElementById('bud-pct').addEventListener('input', renderBudget);
 
 function renderBudget() {
   var d = DB[cur] || {gano:[],debo:[],invierto:[],consumo:[],notes:''};
-  var allItems = d.gano.concat(d.debo, d.invierto, d.consumo);
 
-  // Collect fixed and common from ALL sections
+  // Collect fixed and common items
   var fijos = [], comunes = [];
   ['consumo','debo','invierto'].forEach(function(sec){
     (d[sec]||[]).forEach(function(it){
@@ -822,19 +821,30 @@ function renderBudget() {
   var totalComunes = comunes.reduce(function(s,x){return s+x.val;},0);
   var totalFixed = totalFijos + totalComunes;
 
-  // Budget calc
+  // Core calculations
   var ingresos = sum(d.gano);
   var pctEl = document.getElementById('bud-pct');
   var savePct = Math.max(1, Math.min(80, parseFloat(pctEl ? pctEl.value : 10) || 10));
   var metaAhorro = ingresos * (savePct/100);
-  var invTotal = sum(d.invierto);
-  var efectivoAhorro = Math.max(metaAhorro, invTotal);
-  var disponible = ingresos - efectivoAhorro - totalFixed;
-  var gastadoLibre = sum(d.consumo) - fijos.filter(function(x){return x.sec==='consumo';}).reduce(function(s,x){return s+x.val;},0)
-                   - comunes.filter(function(x){return x.sec==='consumo';}).reduce(function(s,x){return s+x.val;},0);
-  var usado = totalFixed + gastadoLibre;
-  var pctUsado = ingresos > 0 ? Math.min(100, Math.round(usado/ingresos*100)) : 0;
-  var pctDisp = ingresos > 0 ? Math.round(disponible/ingresos*100) : 0;
+
+  // Max to spend = ingresos - ahorro meta - gastos fijos/comunes
+  var maxGasto = Math.max(0, ingresos - metaAhorro - totalFixed);
+
+  // Free spending = consumo minus the fixed/common items in consumo
+  var fijosCon = fijos.filter(function(x){return x.sec==='consumo';}).reduce(function(s,x){return s+x.val;},0);
+  var comunesCon = comunes.filter(function(x){return x.sec==='consumo';}).reduce(function(s,x){return s+x.val;},0);
+  var gastadoLibre = Math.max(0, sum(d.consumo) - fijosCon - comunesCon);
+
+  // Progress
+  var pctUsado = maxGasto > 0 ? Math.min(100, Math.round(gastadoLibre/maxGasto*100)) : 0;
+  var margen = Math.max(0, maxGasto - gastadoLibre);
+  var barColor = pctUsado < 70 ? 'var(--green)' : pctUsado < 90 ? 'var(--amber)' : 'var(--red)';
+  var alertClass = pctUsado < 70 ? 'ok' : pctUsado < 90 ? 'warn' : 'danger';
+  var alertMsg = pctUsado < 70
+    ? '&#10003; Vas bien. Te quedan ' + fmtF(margen) + ' de margen libre este mes.'
+    : pctUsado < 90
+    ? '&#9888; Precaucion. Has usado el '+pctUsado+'% de tu presupuesto disponible.'
+    : '&#9888; Alerta. Has superado o estas muy cerca del limite de gasto libre.';
 
   document.getElementById('bud-period-lbl').textContent = 'Basado en ' + cur;
 
@@ -844,27 +854,16 @@ function renderBudget() {
     {l:'Ingresos del mes', sub:'', v:fmtF(ingresos), c:'var(--green)'},
     {l:'Meta ahorro / inversión ('+savePct+'%)', sub:'Mínimo recomendado', v:fmtF(metaAhorro), c:'var(--blue)'},
     {l:'Gastos fijos y comunes', sub:fijos.length+' fijos, '+comunes.length+' comunes', v:fmtF(totalFixed), c:'var(--amber)'},
-    {l:'Máximo disponible para gastar', sub:'Ingresos - ahorro - fijos', v:fmtF(Math.max(0,disponible)), c: disponible>=0?'var(--green)':'var(--red)'},
+    {l:'Máximo disponible para gastar', sub:'Ingresos - ahorro - fijos', v:fmtF(maxGasto), c: maxGasto>0?'var(--green)':'var(--red)'},
   ].map(function(r){
     return '<div class="bud-row"><div><div class="bud-lbl">'+r.l+'</div>'+(r.sub?'<div class="bud-lbl-sub">'+r.sub+'</div>':'')+'</div><div class="bud-val" style="color:'+r.c+'">'+r.v+'</div></div>';
   }).join('');
 
   // Disponible card
   var dispEl = document.getElementById('bud-disponible');
-  var pctUsado2 = maxGasto > 0 ? Math.min(100, Math.round(gastadoLibre/maxGasto*100)) : 0;
-  var barColor = pctUsado2 < 70 ? 'var(--green)' : pctUsado2 < 90 ? 'var(--amber)' : 'var(--red)';
-  var alertClass = pctUsado2 < 70 ? 'ok' : pctUsado2 < 90 ? 'warn' : 'danger';
-  var margen = Math.max(0, maxGasto - gastadoLibre);
-  var alertMsg = pctUsado2 < 70
-    ? '&#10003; Vas bien. Te quedan ' + fmtF(margen) + ' de margen libre este mes.'
-    : pctUsado2 < 90
-    ? '&#9888; Precaucion. Has usado el '+pctUsado2+'% de tu presupuesto disponible.'
-    : '&#9888; Alerta. Has superado o estas muy cerca del limite de gasto libre.';
-
-  var maxGasto = Math.max(0, ingresos - metaAhorro - totalFixed);
   dispEl.innerHTML = '<div class="bud-bar-wrap">'
     + '<div class="bud-bar-lbl"><span>Gastado libre: '+fmtF(gastadoLibre)+'</span><span>Maximo: '+fmtF(maxGasto)+'</span></div>'
-    + '<div class="bud-bar-track"><div class="bud-bar-fill" style="width:'+Math.min(100,pctUsado2)+'%;background:'+barColor+';"></div></div>'
+    + '<div class="bud-bar-track"><div class="bud-bar-fill" style="width:'+pctUsado+'%;background:'+barColor+';"></div></div>'
     + '</div>'
     + '<div class="bud-alert '+alertClass+'">'+alertMsg+'</div>';
 
@@ -876,8 +875,9 @@ function renderBudget() {
     fixedEl.innerHTML = '<div class="empty-msg">Marca ítems como Fijo o Comun al registrarlos</div>';
   } else {
     fixedEl.innerHTML = allFixed.map(function(it){
-      var tagCls = fijos.indexOf(it)>=0 ? 'tag-fijo' : 'tag-comun';
-      var tagLbl = fijos.indexOf(it)>=0 ? 'Fijo' : 'Comun';
+      var esFijo = fijos.indexOf(it) >= 0;
+      var tagCls = esFijo ? 'tag-fijo' : 'tag-comun';
+      var tagLbl = esFijo ? 'Fijo' : 'Comun';
       return '<div class="fixed-row"><span class="fixed-name"><span class="fixed-tag '+tagCls+'">'+tagLbl+'</span>'+it.name+'</span><span class="fixed-val" style="color:var(--amber)">'+fmtF(it.val)+'</span></div>';
     }).join('');
   }
