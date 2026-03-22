@@ -857,7 +857,9 @@ function doImport() {
 
     lines.forEach(function(line) {
       line = line.trim();
-      // Month header: === Enero 2026 ===
+      if (!line) return;
+
+      // Month header: === Marzo 2026 ===
       var mMatch = line.match(/^===\s*(.+?)\s*===$/);
       if (mMatch) {
         curKey = mMatch[1];
@@ -867,24 +869,38 @@ function doImport() {
       }
       if (!curKey) return;
 
-      // Section headers
-      if (line.startsWith('INGRESOS:')) { curSec = 'gano'; return; }
-      if (line.startsWith('DEUDAS:')) { curSec = 'debo'; return; }
-      if (line.startsWith('INVERSION:')) { curSec = 'invierto'; return; }
-      if (line.startsWith('CONSUMO:')) { curSec = 'consumo'; return; }
-      if (line.startsWith('BALANCE:') || line.startsWith('Moneda:') || line.startsWith('DGO Capital')) { curSec = null; return; }
-      if (line.startsWith('NOTAS:')) { newDB[curKey].notes = line.replace('NOTAS:','').trim(); curSec = null; return; }
+      // Section headers (these lines start with the keyword + colon + total value)
+      if (/^INGRESOS:/i.test(line)) { curSec = 'gano'; return; }
+      if (/^DEUDAS:/i.test(line)) { curSec = 'debo'; return; }
+      if (/^INVERSION:/i.test(line)) { curSec = 'invierto'; return; }
+      if (/^CONSUMO:/i.test(line)) { curSec = 'consumo'; return; }
+      if (/^BALANCE:/i.test(line) || /^Moneda:/i.test(line) || /^DGO Capital/i.test(line)) { curSec = null; return; }
+      if (/^NOTAS:/i.test(line)) {
+        newDB[curKey].notes = line.replace(/^NOTAS:/i,'').trim();
+        curSec = null; return;
+      }
 
-      // Items: "  Descripcion: $1.234.567" or "  Descripcion: $ 1.234.567"
-      if (curSec && line.startsWith('  ')) {
-        var clean = line.trim();
-        var lastColon = clean.lastIndexOf(':');
-        if (lastColon < 0) return;
-        var desc = clean.substring(0, lastColon).trim();
-        var valStr = clean.substring(lastColon+1).trim()
-          .replace(/\$/g,'').replace(/[.]/g,'').replace(/[,]/g,'.').replace(/\s/g,'').replace(/-/g,'');
+      // Item lines: "Descripcion: $5.460.790" or "Descripcion: $ 5.460.790"
+      // Must have a colon and a value starting with $ or a number
+      if (curSec) {
+        var lastColon = line.lastIndexOf(':');
+        if (lastColon < 1) return;
+        var desc = line.substring(0, lastColon).trim();
+        var valRaw = line.substring(lastColon+1).trim();
+        // Must look like a currency value
+        if (!valRaw.match(/^-?\s*\$?\s*[\d]/)) return;
+        // Parse COP format: $5.460.790 -> 5460790
+        // Remove $, spaces, then remove dots used as thousands separators
+        var valStr = valRaw.replace(/\$/g,'').replace(/\s/g,'');
+        // If it has a comma, treat comma as decimal separator
+        if (valStr.indexOf(',') >= 0) {
+          valStr = valStr.replace(/\./g,'').replace(',','.');
+        } else {
+          // All dots are thousands separators in COP format
+          valStr = valStr.replace(/\./g,'');
+        }
         var val = parseFloat(valStr) || 0;
-        if (desc) newDB[curKey][curSec].push({desc:desc, val:val, tipo:'normal'});
+        if (desc && val >= 0) newDB[curKey][curSec].push({desc:desc, val:val, tipo:'normal'});
       }
     });
 
