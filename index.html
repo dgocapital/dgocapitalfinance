@@ -303,14 +303,7 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
           <input class="inp-v" id="v-gano" type="number" placeholder="Valor"/>
           <button class="btn-plus" id="btn-gano" style="background:var(--green);color:#fff;">+</button>
         </div>
-        <div class="add-form-ext">
-          <span style="font-size:11px;color:var(--text3);">Tipo:</span>
-          <select class="tipo-sel" id="tipo-gano">
-            <option value="normal">Normal</option>
-            <option value="fijo">&#128274; Fijo</option>
-            <option value="comun">&#128260; Comun</option>
-          </select>
-        </div>
+
       </div>
     </div>
 
@@ -335,14 +328,7 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
           <input class="inp-v" id="v-debo" type="number" placeholder="Valor"/>
           <button class="btn-plus" id="btn-debo" style="background:var(--red);color:#fff;">+</button>
         </div>
-        <div class="add-form-ext">
-          <span style="font-size:11px;color:var(--text3);">Tipo:</span>
-          <select class="tipo-sel" id="tipo-debo">
-            <option value="normal">Normal</option>
-            <option value="fijo">&#128274; Fijo</option>
-            <option value="comun">&#128260; Comun</option>
-          </select>
-        </div>
+
       </div>
     </div>
 
@@ -367,14 +353,7 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
           <input class="inp-v" id="v-invierto" type="number" placeholder="Valor"/>
           <button class="btn-plus" id="btn-invierto" style="background:var(--blue);color:#fff;">+</button>
         </div>
-        <div class="add-form-ext">
-          <span style="font-size:11px;color:var(--text3);">Tipo:</span>
-          <select class="tipo-sel" id="tipo-invierto">
-            <option value="normal">Normal</option>
-            <option value="fijo">&#128274; Fijo</option>
-            <option value="comun">&#128260; Comun</option>
-          </select>
-        </div>
+
       </div>
     </div>
 
@@ -811,11 +790,11 @@ function renderSec(sec) {
 function addItem(sec) {
   var d = document.getElementById('d-'+sec);
   var v = document.getElementById('v-'+sec);
-  var t = document.getElementById('tipo-'+sec);
   var desc = d.value.trim();
   var val = parseFloat(v.value) || 0;
   if (!desc) return;
-  var tipo = t ? t.value : 'normal';
+  var tipoEl = document.getElementById('tipo-'+sec);
+  var tipo = tipoEl ? tipoEl.value : 'normal';
   DB[cur][sec].push({desc:desc, val:val, tipo:tipo});
   d.value = ''; v.value = '';
   saveDB(); renderSec(sec); renderBudget();d.focus();
