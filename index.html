@@ -13,7 +13,7 @@
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" sizes="512x512" href="apple-touch-icon.png"/>
 <link rel="icon" type="image/png" href="apple-touch-icon.png"/>
-<!-- DGO Capital Finance v1.3 -->
+<!-- DGO Capital Finance v1.4 -->
 <title>DGO Capital — Finance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
@@ -47,6 +47,10 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
 .add-month-btn{font-size:11px;padding:6px 13px;border-radius:20px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-weight:500;cursor:pointer;}
 .add-month-btn:active{background:var(--accent);color:#fff;}
 .currency-badge{font-size:11px;padding:5px 10px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;font-weight:500;}
+/* Hide balance button */
+.hide-balance-btn{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.hide-balance-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.hide-balance-btn.hidden-on{border-color:var(--accent);color:var(--accent);}
 .tb-months{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;}
 .tb-months::-webkit-scrollbar{display:none;}
 .mpill{flex-shrink:0;font-size:11px;font-weight:500;padding:5px 13px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;}
@@ -67,6 +71,8 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
 .hstats{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .hstat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;}
 .hstat-val{font-size:14px;font-weight:500;}
+/* Blurred balance */
+.balance-hidden .hero-amount,.balance-hidden .hstat-val,.balance-hidden .sec-tot,.balance-hidden .stot-val{filter:blur(6px);user-select:none;}
 .section{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;}
 .sec-hd{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;cursor:pointer;}
 .sec-hd:active{background:var(--bg4);}
@@ -142,18 +148,11 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
 .set-sub{font-size:11px;color:var(--text3);margin-top:2px;}
 .set-btn{font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;}
 .danger-btn{width:100%;padding:13px;border-radius:var(--r);border:1px solid var(--red-soft);background:transparent;color:var(--red);font-size:13px;cursor:pointer;}
-
-
-
-
-
-
 .storage-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;display:flex;flex-direction:column;gap:10px;}
 .storage-item{display:flex;gap:10px;align-items:flex-start;}
 .storage-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
 .storage-txt{font-size:12px;color:var(--text2);line-height:1.5;}
 .storage-txt b{color:var(--text);font-weight:500;}
-
 .tag-fijo{display:inline-block;font-size:9px;padding:2px 7px;border-radius:20px;background:#1a3850;color:#5ab4f0;font-weight:500;margin-left:4px;vertical-align:middle;}
 .tag-comun{display:inline-block;font-size:9px;padding:2px 7px;border-radius:20px;background:#2d2218;color:#f0a832;font-weight:500;margin-left:4px;vertical-align:middle;}
 .irow-type{display:flex;gap:4px;margin-left:4px;flex-shrink:0;}
@@ -190,7 +189,6 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
 .fixed-name{font-size:12px;color:var(--text2);}
 .fixed-val{font-size:12px;font-weight:500;}
 .fixed-tag{font-size:9px;padding:2px 7px;border-radius:20px;font-weight:500;margin-right:6px;}
-
 .ia-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-xl);padding:20px;position:relative;overflow:hidden;}
 .ia-card::before{content:"";position:absolute;top:-40px;right:-40px;width:130px;height:130px;background:var(--accent);opacity:0.06;border-radius:50%;}
 .ia-title{font-family:"Syne",sans-serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;}
@@ -206,7 +204,6 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
 .ia-scope{display:flex;gap:8px;margin-bottom:16px;}
 .ia-scope-btn{flex:1;padding:9px;border-radius:var(--r);border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;font-family:"DM Sans",sans-serif;transition:all 0.15s;}
 .ia-scope-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
-
 .growth-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;overflow:hidden;}
 .growth-title{font-family:"Syne",sans-serif;font-size:13px;font-weight:600;margin-bottom:4px;}
 .growth-sub{font-size:10px;color:var(--text3);margin-bottom:14px;}
@@ -226,7 +223,6 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
 .notif-status.ok{background:var(--green-dim);color:var(--green);}
 .notif-status.warn{background:var(--amber-soft);color:var(--amber);}
 .notif-status.err{background:var(--red-dim);color:var(--red);}
-
 .sect-lbl{font-family:"Syne",sans-serif;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin:4px 0 2px;}
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.72);display:flex;align-items:flex-end;z-index:50;padding-bottom:env(safe-area-inset-bottom);}
 .modal-box{background:var(--bg2);border-radius:var(--r-xl) var(--r-xl) 0 0;padding:24px 20px 36px;width:100%;border:1px solid var(--border);border-bottom:none;}
@@ -242,6 +238,40 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
 .cur-sym{font-family:"Syne",sans-serif;font-size:15px;font-weight:700;display:block;margin-bottom:2px;}
 .cur-nm{font-size:9px;color:var(--text3);display:block;}
 .cur-opt.sel .cur-nm{color:var(--accent);}
+
+/* ── FACTURAS / RECORDATORIOS ─────────────────────────────────────────────── */
+/* Botón en vista Control */
+.facturas-btn{display:flex;align-items:center;gap:10px;padding:13px 15px;border-radius:var(--r-lg);border:1px solid var(--border);background:var(--bg3);color:var(--text);cursor:pointer;width:100%;text-align:left;font-family:"DM Sans",sans-serif;}
+.facturas-btn:active{background:var(--bg4);}
+.facturas-btn-ico{width:36px;height:36px;border-radius:10px;background:#1a3850;color:#5ab4f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.facturas-btn-ico svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.facturas-btn-txt{flex:1;}
+.facturas-btn-title{font-family:"Syne",sans-serif;font-size:13px;font-weight:600;}
+.facturas-btn-sub{font-size:10px;color:var(--text3);margin-top:2px;}
+.facturas-btn-arrow{font-size:16px;color:var(--text3);}
+.facturas-count-badge{min-width:20px;height:20px;border-radius:10px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;padding:0 5px;}
+
+/* Heatmap flag */
+.hm-flag{position:absolute;top:1px;right:1px;width:6px;height:7px;background:#f0a832;clip-path:polygon(0 0,100% 0,100% 70%,50% 100%,0 70%);}
+.hm-flag.done{background:var(--green);}
+
+/* Modal facturas - scroll */
+.modal-box.scroll{max-height:85vh;overflow-y:auto;}
+
+/* Factura list item */
+.factura-item{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);}
+.factura-item:last-child{border-bottom:none;}
+.factura-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);background:transparent;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;}
+.factura-check.done{border-color:var(--green);background:var(--green-dim);color:var(--green);}
+.factura-info{flex:1;min-width:0;}
+.factura-name{font-size:12px;color:var(--text);font-weight:500;}
+.factura-name.done{text-decoration:line-through;color:var(--text3);}
+.factura-date{font-size:10px;color:var(--text3);margin-top:2px;}
+.factura-del{font-size:16px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0 4px;}
+.factura-del:active{color:var(--red);}
+
+/* Flag en heatmap cell */
+.hm-cell-flag{position:absolute;top:1px;right:1px;width:5px;height:6px;clip-path:polygon(0 0,100% 0,100% 65%,50% 100%,0 65%);}
 </style>
 </head>
 <body>
@@ -259,6 +289,10 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
       </div>
     </div>
     <div class="tb-actions">
+      <!-- Ocultar balances -->
+      <button class="hide-balance-btn" id="btn-hide-balance" title="Ocultar balances">
+        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
       <button class="currency-badge" id="cur-badge">COP</button>
       <button class="add-month-btn" id="btn-add-month">+ Mes</button>
     </div>
@@ -269,7 +303,7 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
 <div id="content">
 
   <div class="view active" id="view-registro">
-    <div class="hero-card">
+    <div class="hero-card" id="hero-card">
       <div class="hero-label">Balance general del mes</div>
       <div class="hero-amount" id="hero-amount">$ 0</div>
       <div class="hero-month-lbl" id="hero-month">—</div>
@@ -303,7 +337,6 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
           <input class="inp-v" id="v-gano" type="number" placeholder="Valor"/>
           <button class="btn-plus" id="btn-gano" style="background:var(--green);color:#fff;">+</button>
         </div>
-
       </div>
     </div>
 
@@ -328,7 +361,6 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
           <input class="inp-v" id="v-debo" type="number" placeholder="Valor"/>
           <button class="btn-plus" id="btn-debo" style="background:var(--red);color:#fff;">+</button>
         </div>
-
       </div>
     </div>
 
@@ -353,7 +385,6 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
           <input class="inp-v" id="v-invierto" type="number" placeholder="Valor"/>
           <button class="btn-plus" id="btn-invierto" style="background:var(--blue);color:#fff;">+</button>
         </div>
-
       </div>
     </div>
 
@@ -403,7 +434,6 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
       <div class="dash-sub" id="bud-period-lbl">Basado en el mes actual</div>
     </div>
 
-    <!-- Meta de ahorro -->
     <div class="bud-card">
       <div class="bud-title">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg>
@@ -419,7 +449,6 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
       <div id="bud-summary"></div>
     </div>
 
-    <!-- Disponible para gastar -->
     <div class="bud-card" id="bud-disponible-card">
       <div class="bud-title">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -430,7 +459,6 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
 
     <div id="fixed-total-lbl" style="display:none;"></div>
     <div id="fixed-items-list" style="display:none;"></div>
-
     <div style="height:6px;"></div>
   </div>
 
@@ -439,6 +467,19 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
       <div class="dash-title">Control financiero</div>
       <div class="dash-sub" id="dash-period">Periodo completo</div>
     </div>
+
+    <!-- Botón Gestión de Facturas -->
+    <button class="facturas-btn" id="btn-open-facturas">
+      <div class="facturas-btn-ico">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg>
+      </div>
+      <div class="facturas-btn-txt">
+        <div class="facturas-btn-title">Gestión de Facturas</div>
+        <div class="facturas-btn-sub" id="facturas-btn-sub">Configura tus pagos recurrentes</div>
+      </div>
+      <span class="facturas-btn-arrow">&#8250;</span>
+    </button>
+
     <div id="dash-empty" class="empty-dash" style="display:none;">
       <div style="font-size:32px;margin-bottom:10px;">&#128202;</div>
       Registra al menos un mes para ver tu analisis
@@ -460,7 +501,6 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
         <div style="padding:13px 15px;border-bottom:1px solid var(--border);font-family:'Syne',sans-serif;font-size:13px;font-weight:600;">Resumen mensual</div>
         <table class="months-table"><thead><tr><th>Mes</th><th>Gano</th><th>Invierto</th><th>Debo</th><th>Consumo</th><th>Balance</th></tr></thead><tbody id="months-tbody"></tbody></table>
       </div>
-
 
       <div class="growth-card">
         <div class="growth-title">Crecimiento patrimonial</div>
@@ -500,8 +540,8 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
       <div class="ia-title">¿Qué quieres analizar?</div>
       <div class="ia-sub">Selecciona el alcance y Claude recibirá un resumen completo de tus finanzas con preguntas de análisis ya formuladas.</div>
       <div class="ia-scope">
-        <button class="ia-scope-btn active" id="scope-mes" >Mes actual</button>
-        <button class="ia-scope-btn" id="scope-todo" >Todo el período</button>
+        <button class="ia-scope-btn active" id="scope-mes">Mes actual</button>
+        <button class="ia-scope-btn" id="scope-todo">Todo el período</button>
       </div>
       <button class="ia-btn" id="btn-analizar">
         <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -532,7 +572,7 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
   <div class="view" id="view-ajustes">
     <div>
       <div class="dash-title">Ajustes</div>
-      <div class="dash-sub">DGO Capital Finance v1.1</div>
+      <div class="dash-sub">DGO Capital Finance v1.4</div>
     </div>
     <div class="set-card">
       <div class="set-row" id="row-currency" style="cursor:pointer;">
@@ -548,7 +588,7 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
       <div class="set-row"><div><div class="set-label">Meses registrados</div><div class="set-sub" id="set-months-count">0 meses</div></div></div>
       <div class="set-row"><div><div class="set-label">Exportar datos</div><div class="set-sub">Copia o comparte todos tus registros</div></div><button class="set-btn" id="btn-export">Exportar</button></div>
       <div class="set-row"><div><div class="set-label">Importar datos</div><div class="set-sub">Restaura un respaldo exportado</div></div><button class="set-btn" id="btn-import" style="color:var(--green);">Importar</button></div>
-      <div class="set-row"><div><div class="set-label">Version</div><div class="set-sub">DGO Capital Finance v1.1</div></div></div>
+      <div class="set-row"><div><div class="set-label">Version</div><div class="set-sub">DGO Capital Finance v1.4</div></div></div>
     </div>
     <div class="sect-lbl">Donde se guardan tus datos</div>
     <div class="storage-card">
@@ -567,7 +607,6 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
       </div>
       <div id="notif-status" class="notif-status warn" style="display:none;"></div>
     </div>
-
     <button class="danger-btn" id="btn-clear">Borrar todos los datos</button>
     <div style="height:6px;"></div>
   </div>
@@ -600,6 +639,7 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
 </div>
 <script>
 const KEY = 'dgocapital_v1';
+const FACTURAS_KEY = 'dgocapital_facturas_v1';
 const CURRENCIES = [
   {code:'COP',symbol:'$',name:'Pesos colombianos',loc:'es-CO',dec:0},
   {code:'USD',symbol:'US$',name:'Dolar estadounidense',loc:'en-US',dec:2},
@@ -617,6 +657,84 @@ let DB = {};
 let cur = '';
 let CC = CURRENCIES[0];
 let collapsed = {gano:false,debo:false,invierto:false,consumo:false};
+let balanceHidden = false;
+
+// ── FACTURAS DB ─────────────────────────────────────────────────────────────
+// facturas: array of { id, name, dia (1-31), executedMonths: ['Marzo 2026', ...] }
+let FACTURAS = [];
+
+function loadFacturas() {
+  try { var s = localStorage.getItem(FACTURAS_KEY); if(s) FACTURAS = JSON.parse(s); } catch(e) { FACTURAS = []; }
+  if (!Array.isArray(FACTURAS)) FACTURAS = [];
+}
+
+function saveFacturas() {
+  try { localStorage.setItem(FACTURAS_KEY, JSON.stringify(FACTURAS)); } catch(e) {}
+}
+
+// Returns YYYYMMDD key for a factura in a given monthKey and year
+function facturaDateStr(factura, monthKey) {
+  var parts = monthKey.split(' ');
+  var mesNombre = parts[0];
+  var anio = parseInt(parts[1]);
+  var mesIdx = MES.indexOf(mesNombre);
+  if (mesIdx < 0 || isNaN(anio)) return null;
+  var daysInMonth = new Date(anio, mesIdx+1, 0).getDate();
+  var dia = Math.min(factura.dia, daysInMonth);
+  return anio+'-'+String(mesIdx+1).padStart(2,'0')+'-'+String(dia).padStart(2,'0');
+}
+
+function isFacturaDoneInMonth(factura, monthKey) {
+  return factura.executedMonths && factura.executedMonths.indexOf(monthKey) >= 0;
+}
+
+function toggleFacturaExecution(facturaId, monthKey) {
+  var f = FACTURAS.find(function(x){return x.id===facturaId;});
+  if (!f) return;
+  if (!f.executedMonths) f.executedMonths = [];
+  var idx = f.executedMonths.indexOf(monthKey);
+  if (idx >= 0) {
+    f.executedMonths.splice(idx, 1);
+  } else {
+    f.executedMonths.push(monthKey);
+  }
+  saveFacturas();
+}
+
+// Get facturas for a specific month (all facturas are shown every month)
+// Returns {pending:[], done:[]}
+function getFacturasForMonth(monthKey) {
+  var pending = [], done = [];
+  FACTURAS.forEach(function(f){
+    if (isFacturaDoneInMonth(f, monthKey)) done.push(f);
+    else pending.push(f);
+  });
+  return {pending:pending, done:done};
+}
+
+// ── HIDE BALANCE ─────────────────────────────────────────────────────────────
+function toggleHideBalance() {
+  balanceHidden = !balanceHidden;
+  var btn = document.getElementById('btn-hide-balance');
+  var registroView = document.getElementById('view-registro');
+  var dashContent = document.getElementById('dash-content');
+  var periodCard = document.querySelector('.period-card');
+  if (balanceHidden) {
+    btn.classList.add('hidden-on');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+    // Blur amounts in registro
+    registroView.classList.add('balance-hidden');
+    if (periodCard) periodCard.classList.add('balance-hidden');
+    // Also blur dashboard amounts
+    if (dashContent) dashContent.classList.add('balance-hidden');
+  } else {
+    btn.classList.remove('hidden-on');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+    registroView.classList.remove('balance-hidden');
+    if (periodCard) periodCard.classList.remove('balance-hidden');
+    if (dashContent) dashContent.classList.remove('balance-hidden');
+  }
+}
 
 function emptyMonth() { return {gano:[],debo:[],invierto:[],consumo:[],notes:''}; }
 
@@ -632,7 +750,6 @@ function loadDB() {
   }
   var mk = mkeys();
   cur = mk[mk.length-1];
-  // Auto-activate current real month
   var now = new Date();
   var realMonth = MES[now.getMonth()] + ' ' + now.getFullYear();
   if (!DB[realMonth]) DB[realMonth] = emptyMonth();
@@ -768,6 +885,7 @@ function renderCurrent() {
 
 function renderSec(sec) {
   var items = DB[cur][sec];
+  // Colores separados: gastos=amber, deudas=red
   var cols = {gano:'var(--green)',debo:'var(--red)',invierto:'var(--blue)',consumo:'var(--amber)'};
   document.getElementById('empty-'+sec).style.display = items.length ? 'none' : 'block';
   var list = document.getElementById('list-'+sec);
@@ -812,7 +930,7 @@ function addItem(sec) {
   var fecha = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
   DB[cur][sec].push({desc:desc, val:val, tipo:tipo, fecha:fecha});
   d.value = ''; v.value = '';
-  saveDB(); renderSec(sec); renderBudget();d.focus();
+  saveDB(); renderSec(sec); renderBudget(); d.focus();
 }
 
 function delItem(sec, i) {
@@ -829,6 +947,10 @@ function toggleSec(sec) {
 function renderDash() {
   var keys = mkeys(); var n = keys.length;
   document.getElementById('dash-period').textContent = n===0 ? 'Sin datos aun' : n===1 ? '1 mes registrado' : n+' meses - '+keys[0]+' a '+keys[keys.length-1];
+
+  // Update facturas button subtitle
+  updateFacturasBtnSub();
+
   if (n===0) {
     document.getElementById('dash-empty').style.display='block';
     document.getElementById('dash-content').style.display='none';
@@ -857,16 +979,27 @@ function renderDash() {
     var bg=g-de+inv-con;
     return '<tr><td>'+k.split(' ')[0].substring(0,3)+' '+k.split(' ')[1]+'</td><td style="color:var(--green)">'+fmt(g)+'</td><td style="color:var(--blue)">'+fmt(inv)+'</td><td style="color:var(--red)">'+fmt(de)+'</td><td style="color:var(--amber)">'+fmt(con)+'</td><td><span class="badge '+(bg>=0?'badge-pos':'badge-neg')+'">'+fmt(bg)+'</span></td></tr>';
   }).join('');
-  var gMap = {};
-  keys.forEach(function(k){
-    DB[k].consumo.forEach(function(it){
-      var nm = it.desc.toUpperCase().trim();
-      if(!gMap[nm]) gMap[nm]={name:it.desc,total:0,count:0};
-      gMap[nm].total += Number(it.val)||0; gMap[nm].count++;
-    });
-  });
   setTimeout(renderGrowthChart, 100);
   setTimeout(renderHeatmap, 150);
+}
+
+function updateFacturasBtnSub() {
+  var sub = document.getElementById('facturas-btn-sub');
+  if (!sub) return;
+  if (!FACTURAS.length) {
+    sub.textContent = 'Configura tus pagos recurrentes';
+    return;
+  }
+  var now = new Date();
+  var monthKey = MES[now.getMonth()] + ' ' + now.getFullYear();
+  var res = getFacturasForMonth(monthKey);
+  var pending = res.pending.length;
+  var total = FACTURAS.length;
+  if (pending === 0) {
+    sub.textContent = '✓ Todas las facturas pagadas este mes (' + total + ')';
+  } else {
+    sub.textContent = pending + ' pendiente' + (pending>1?'s':'') + ' de ' + total + ' facturas';
+  }
 }
 
 function renderSettings() {
@@ -924,142 +1057,156 @@ function saveEdit(sec, idx) {
   renderBudget();
 }
 
-function showImportModal() {
-  var ex = document.getElementById('import-modal'); if(ex) ex.remove();
+// ── MODAL GESTIÓN DE FACTURAS ────────────────────────────────────────────────
+function showFacturasModal() {
+  var ex = document.getElementById('facturas-modal'); if(ex) ex.remove();
   var div = document.createElement('div');
-  div.className = 'modal-bg'; div.id = 'import-modal';
-  div.innerHTML = '<div class="modal-box">'
-    + '<h3>Importar datos</h3>'
-    + '<p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5;">Pega aqui el texto que exportaste anteriormente. Tus datos actuales seran reemplazados.</p>'
-    + '<textarea id="import-ta" style="width:100%;height:140px;font-size:11px;padding:10px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg3);color:var(--text);resize:none;font-family:var(--font-sans);line-height:1.5;" placeholder="Pega aqui el texto exportado..."></textarea>'
-    + '<div id="import-err" style="font-size:11px;color:var(--red);margin:6px 0;display:none;"></div>'
-    + '<div class="mbtns" style="margin-top:10px;">'
-    + '<button class="mbtn-c" id="import-cancel">Cancelar</button>'
-    + '<button class="mbtn-ok" id="import-ok" style="background:var(--green);">Restaurar</button>'
-    + '</div></div>';
+  div.className = 'modal-bg'; div.id = 'facturas-modal';
+
+  var now = new Date();
+  var monthKey = MES[now.getMonth()] + ' ' + now.getFullYear();
+
+  div.innerHTML = buildFacturasModalHTML(monthKey);
   document.body.appendChild(div);
-  div.querySelector('#import-cancel').addEventListener('click', function(){ div.remove(); });
-  div.querySelector('#import-ok').addEventListener('click', function(){ doImport(); });
+  wireFacturasModal(div, monthKey);
 }
 
-function doImport() {
-  var text = (document.getElementById('import-ta').value || '').trim();
-  var errEl = document.getElementById('import-err');
-  if (!text) { errEl.textContent = 'Pega el texto exportado primero.'; errEl.style.display='block'; return; }
+function buildFacturasModalHTML(monthKey) {
+  var res = getFacturasForMonth(monthKey);
 
-  try {
-    var newDB = {};
-    text = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
-    var lines = text.split('\n');
-    var curKey = null;
-    var curSec = null;
-    var MES_LIST = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  var itemsHTML = '';
+  var allItems = res.pending.concat(res.done);
 
-    lines.forEach(function(line) {
-      line = line.trim();
-      if (!line) return;
-
-      // Month header: === Marzo 2026 ===
-      var mMatch = line.match(/^===\s*(.+?)\s*===$/);
-      if (mMatch) {
-        curKey = mMatch[1];
-        newDB[curKey] = {gano:[],debo:[],invierto:[],consumo:[],notes:''};
-        curSec = null;
-        return;
+  if (!allItems.length) {
+    itemsHTML = '<div class="empty-msg" style="padding:12px 0;color:var(--text3);font-size:12px;">No hay facturas configuradas aún</div>';
+  } else {
+    allItems.forEach(function(f){
+      var done = isFacturaDoneInMonth(f, monthKey);
+      var dateStr = facturaDateStr(f, monthKey);
+      var diaLabel = 'Día ' + f.dia + ' de cada mes';
+      if (dateStr) {
+        var parts = dateStr.split('-');
+        diaLabel = 'Día ' + parseInt(parts[2]) + ' · ' + monthKey;
       }
-      if (!curKey) return;
+      itemsHTML += '<div class="factura-item" data-fid="' + f.id + '">'
+        + '<button class="factura-check ' + (done?'done':'') + '" data-fid="' + f.id + '" data-month="' + monthKey + '">' + (done?'✓':'') + '</button>'
+        + '<div class="factura-info">'
+        + '<div class="factura-name ' + (done?'done':'') + '">' + escapeHtml(f.name) + '</div>'
+        + '<div class="factura-date">' + diaLabel + '</div>'
+        + '</div>'
+        + '<button class="factura-del" data-fid="' + f.id + '">&#215;</button>'
+        + '</div>';
+    });
+  }
 
-      // Section headers (these lines start with the keyword + colon + total value)
-      if (/^INGRESOS:/i.test(line)) { curSec = 'gano'; return; }
-      if (/^DEUDAS:/i.test(line)) { curSec = 'debo'; return; }
-      if (/^INVERSION:/i.test(line)) { curSec = 'invierto'; return; }
-      if (/^CONSUMO:/i.test(line)) { curSec = 'consumo'; return; }
-      if (/^BALANCE:/i.test(line) || /^Moneda:/i.test(line) || /^DGO Capital/i.test(line)) { curSec = null; return; }
-      if (/^NOTAS:/i.test(line)) {
-        newDB[curKey].notes = line.replace(/^NOTAS:/i,'').trim();
-        curSec = null; return;
-      }
+  return '<div class="modal-box scroll"><h3>&#127987; Gestión de Facturas</h3>'
+    + '<div style="font-size:11px;color:var(--text3);margin-bottom:14px;line-height:1.5;">Las facturas se repiten automáticamente cada mes. Márcalas como pagadas cuando las ejecutes.</div>'
+    + '<div id="facturas-list">' + itemsHTML + '</div>'
+    + '<div style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">'
+    + '<div style="font-size:11px;color:var(--text2);font-weight:600;margin-bottom:8px;">Agregar nueva factura</div>'
+    + '<div style="display:flex;gap:6px;align-items:center;">'
+    + '<input class="modal-inp" id="new-factura-name" placeholder="Nombre (Ej: Arrendo)" style="flex:2;margin-bottom:0;"/>'
+    + '<input class="modal-inp" id="new-factura-dia" type="number" min="1" max="31" placeholder="Día" style="flex:1;margin-bottom:0;width:60px;"/>'
+    + '<button id="btn-add-factura" style="padding:11px 14px;border-radius:var(--r);border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">+ Agregar</button>'
+    + '</div>'
+    + '<div style="font-size:10px;color:var(--text3);margin-top:6px;">El número es el día del mes en que vence la factura</div>'
+    + '</div>'
+    + '<div style="margin-top:16px;"><button class="mbtn-c" id="facturas-close" style="width:100%;">Cerrar</button></div>'
+    + '</div>';
+}
 
-      // Item lines: "Descripcion: $5.460.790" or "Descripcion: $ 5.460.790"
-      // Must have a colon and a value starting with $ or a number
-      if (curSec) {
-        var lastColon = line.lastIndexOf(':');
-        if (lastColon < 1) return;
-        var desc = line.substring(0, lastColon).trim();
-        var valRaw = line.substring(lastColon+1).trim();
-        // Must look like a currency value
-        if (!valRaw.match(/^-?\s*\$?\s*[\d]/)) return;
-        // Parse COP format: $5.460.790 -> 5460790
-        // Remove $, spaces, then remove dots used as thousands separators
-        var valStr = valRaw.replace(/\$/g,'').replace(/\s/g,'');
-        // If it has a comma, treat comma as decimal separator
-        if (valStr.indexOf(',') >= 0) {
-          valStr = valStr.replace(/\./g,'').replace(',','.');
-        } else {
-          // All dots are thousands separators in COP format
-          valStr = valStr.replace(/\./g,'');
-        }
-        // Detect tipo tag: "$ 1.273.734 [fijo]" or "$ 80.000 [comun]"
-        var tipo = 'normal';
-        var tipoMatch = valRaw.match(/\[(fijo|comun)\]/i);
-        if (tipoMatch) {
-          tipo = tipoMatch[1].toLowerCase();
-          valStr = valStr.replace(/\[.*?\]/g,'').trim();
-        }
-        var val = parseFloat(valStr) || 0;
-        if (desc && val >= 0) newDB[curKey][curSec].push({desc:desc, val:val, tipo:tipo});
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function wireFacturasModal(div, monthKey) {
+  div.querySelector('#facturas-close').addEventListener('click', function(){
+    div.remove();
+    updateFacturasBtnSub();
+    if (document.getElementById('view-dashboard').classList.contains('active')) {
+      setTimeout(renderHeatmap, 50);
+    }
+  });
+
+  div.querySelector('#btn-add-factura').addEventListener('click', function(){
+    var nameEl = document.getElementById('new-factura-name');
+    var diaEl = document.getElementById('new-factura-dia');
+    var name = nameEl ? nameEl.value.trim() : '';
+    var dia = parseInt(diaEl ? diaEl.value : 0);
+    if (!name || !dia || dia < 1 || dia > 31) return;
+    var newF = {id: 'f_' + Date.now(), name: name, dia: dia, executedMonths: []};
+    FACTURAS.push(newF);
+    saveFacturas();
+    nameEl.value = ''; diaEl.value = '';
+    refreshFacturasListInModal(monthKey);
+    updateFacturasBtnSub();
+  });
+
+  div.querySelector('#new-factura-name') && div.querySelector('#new-factura-name').addEventListener('keydown', function(e){
+    if(e.key==='Enter') div.querySelector('#btn-add-factura').click();
+  });
+
+  wireFacturasListEvents(div, monthKey);
+}
+
+function wireFacturasListEvents(div, monthKey) {
+  div.querySelectorAll('.factura-check').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var fid = this.dataset.fid;
+      var mk = this.dataset.month;
+      toggleFacturaExecution(fid, mk);
+      refreshFacturasListInModal(mk);
+      updateFacturasBtnSub();
+      if (document.getElementById('view-dashboard').classList.contains('active')) {
+        setTimeout(renderHeatmap, 50);
       }
     });
-
-    var keys = Object.keys(newDB);
-    if (!keys.length) throw new Error('No se encontraron meses en el texto.');
-
-    // Preserve settings
-    var cfg = DB._cfg || {};
-    DB = newDB;
-    DB._cfg = cfg;
-    cur = keys[0];
-    saveDB();
-
-    document.getElementById('import-modal').remove();
-    renderPills();
-    renderCurrent();
-    alert('Datos restaurados correctamente. ' + keys.length + ' mes(es) importados.');
-  } catch(e) {
-    errEl.textContent = 'Error al importar: ' + e.message;
-    errEl.style.display = 'block';
-  }
-}
-
-function exportData() {
-  var keys = mkeys();
-  var lines = ['DGO Capital Finance - Exportacion','Moneda: '+CC.code+' ('+CC.symbol+')',''];
-  keys.forEach(function(k){
-    var d = DB[k]; lines.push('=== '+k+' ===');
-    lines.push('INGRESOS: '+fmtF(sum(d.gano))); d.gano.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val)+(it.tipo&&it.tipo!=='normal'?' ['+it.tipo+']':''));});
-    lines.push('DEUDAS: '+fmtF(sum(d.debo))); d.debo.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val)+(it.tipo&&it.tipo!=='normal'?' ['+it.tipo+']':''));});
-    lines.push('INVERSION: '+fmtF(sum(d.invierto))); d.invierto.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val)+(it.tipo&&it.tipo!=='normal'?' ['+it.tipo+']':''));});
-    lines.push('CONSUMO: '+fmtF(sum(d.consumo))); d.consumo.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val)+(it.tipo&&it.tipo!=='normal'?' ['+it.tipo+']':''));});
-    var bg=sum(d.gano)-sum(d.debo)+sum(d.invierto)-sum(d.consumo);
-    lines.push('BALANCE: '+fmtF(bg)); if(d.notes) lines.push('NOTAS: '+d.notes); lines.push('');
   });
-  var text = lines.join('\n');
-  if (navigator.share) { navigator.share({title:'DGO Capital',text:text}).catch(function(){}); }
-  else if (navigator.clipboard) { navigator.clipboard.writeText(text).then(function(){alert('Datos copiados');}).catch(function(){alert(text);}); }
-  else { alert(text); }
+
+  div.querySelectorAll('.factura-del').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var fid = this.dataset.fid;
+      var idx = FACTURAS.findIndex(function(x){return x.id===fid;});
+      if (idx >= 0) {
+        FACTURAS.splice(idx, 1);
+        saveFacturas();
+        refreshFacturasListInModal(monthKey);
+        updateFacturasBtnSub();
+      }
+    });
+  });
 }
 
-function confirmClear() {
-  if (confirm('Borrar TODOS los datos? No se puede deshacer.')) {
-    localStorage.removeItem(KEY); DB = {};
-    var now = new Date(); var k = MES[now.getMonth()]+' '+now.getFullYear();
-    DB[k] = emptyMonth(); DB._cfg = {currency:'COP'}; CC = CURRENCIES[0];
-    cur = k; saveDB(); updateCurrencyUI(); renderPills(); renderCurrent(); goView('registro');
+function refreshFacturasListInModal(monthKey) {
+  var listEl = document.getElementById('facturas-list');
+  if (!listEl) return;
+  var res = getFacturasForMonth(monthKey);
+  var allItems = res.pending.concat(res.done);
+  if (!allItems.length) {
+    listEl.innerHTML = '<div class="empty-msg" style="padding:12px 0;color:var(--text3);font-size:12px;">No hay facturas configuradas aún</div>';
+    return;
   }
+  var html = '';
+  allItems.forEach(function(f){
+    var done = isFacturaDoneInMonth(f, monthKey);
+    var diaLabel = 'Día ' + f.dia + ' de cada mes';
+    var dateStr = facturaDateStr(f, monthKey);
+    if (dateStr) { var p=dateStr.split('-'); diaLabel='Día '+parseInt(p[2])+' · '+monthKey; }
+    html += '<div class="factura-item" data-fid="' + f.id + '">'
+      + '<button class="factura-check ' + (done?'done':'') + '" data-fid="' + f.id + '" data-month="' + monthKey + '">' + (done?'✓':'') + '</button>'
+      + '<div class="factura-info">'
+      + '<div class="factura-name ' + (done?'done':'') + '">' + escapeHtml(f.name) + '</div>'
+      + '<div class="factura-date">' + diaLabel + '</div>'
+      + '</div>'
+      + '<button class="factura-del" data-fid="' + f.id + '">&#215;</button>'
+      + '</div>';
+  });
+  listEl.innerHTML = html;
+  var modalDiv = document.getElementById('facturas-modal');
+  if (modalDiv) wireFacturasListEvents(modalDiv, monthKey);
 }
 
-// Wire up all event listeners safely after DOM is ready
-
+// ── PRESUPUESTO ──────────────────────────────────────────────────────────────
 document.getElementById('nav-presupuesto').addEventListener('click', function(){goView('presupuesto');});
 document.getElementById('btn-save-pct').addEventListener('click', function(){
   var pctEl = document.getElementById('bud-pct');
@@ -1096,40 +1243,53 @@ function renderBudget() {
   if(pctEl) pctEl.value = savePct;
 
   var metaAhorro = ingresos * (savePct/100);
-
-  // Maximo = ingresos - meta ahorro% - gastos fijos/comunes
   var maxGasto = Math.max(0, ingresos - metaAhorro - totalFixed);
 
   var fijosCon = fijos.filter(function(x){return x.sec==='consumo';}).reduce(function(s,x){return s+x.val;},0);
   var comunesCon = comunes.filter(function(x){return x.sec==='consumo';}).reduce(function(s,x){return s+x.val;},0);
   var gastadoLibre = Math.max(0, sum(d.consumo) - fijosCon - comunesCon);
 
-  var pctUsado = maxGasto > 0 ? Math.min(100, Math.round(gastadoLibre/maxGasto*100)) : 0;
-  var margen = Math.max(0, maxGasto - gastadoLibre);
+  // Calcular margen: puede ser negativo si excede
+  var margenReal = maxGasto - gastadoLibre;
+  var pctUsado = maxGasto > 0 ? Math.round(gastadoLibre/maxGasto*100) : (gastadoLibre > 0 ? 100 : 0);
+  var pctBarra = Math.min(100, pctUsado); // barra no pasa de 100%
   var barColor = pctUsado < 70 ? 'var(--green)' : pctUsado < 90 ? 'var(--amber)' : 'var(--red)';
-  var alertClass = pctUsado < 70 ? 'ok' : pctUsado < 90 ? 'warn' : 'danger';
-  var alertMsg = pctUsado < 70
-    ? '&#10003; Vas bien. Te quedan ' + fmtF(margen) + ' de margen libre este mes.'
-    : pctUsado < 90
-    ? '&#9888; Precaucion. Has usado el '+pctUsado+'% de tu presupuesto disponible.'
-    : '&#9888; Alerta. Has superado o estas muy cerca del limite de gasto libre.';
+  var alertClass, alertMsg;
+
+  if (margenReal < 0) {
+    // Sin margen: excedido
+    alertClass = 'danger';
+    alertMsg = '&#128683; Te quedaste sin dinero para gastar este mes. Exceso: ' + fmtF(Math.abs(margenReal));
+  } else if (pctUsado < 70) {
+    alertClass = 'ok';
+    alertMsg = '&#10003; Vas bien. Te quedan ' + fmtF(margenReal) + ' de margen libre este mes.';
+  } else if (pctUsado < 90) {
+    alertClass = 'warn';
+    alertMsg = '&#9888; Precaucion. Has usado el '+pctUsado+'% de tu presupuesto disponible.';
+  } else {
+    alertClass = 'danger';
+    alertMsg = '&#9888; Alerta. Has superado o estas muy cerca del limite de gasto libre.';
+  }
 
   document.getElementById('bud-period-lbl').textContent = 'Basado en ' + cur;
+
+  // Mostrar máximo como negativo si excede
+  var maxGastoDisplay = margenReal < 0 ? -Math.abs(margenReal) : maxGasto;
 
   var sumEl = document.getElementById('bud-summary');
   sumEl.innerHTML = [
     {l:'Ingresos del mes', sub:'', v:fmtF(ingresos), c:'var(--green)'},
     {l:'Meta ahorro / inversión ('+savePct+'%)', sub:'Mínimo recomendado', v:fmtF(metaAhorro), c:'var(--blue)'},
     {l:'Gastos fijos y comunes', sub:fijos.length+' fijos, '+comunes.length+' comunes', v:fmtF(totalFixed), c:'var(--amber)'},
-    {l:'Máximo disponible para gastar', sub:'Ingresos - ahorro - fijos', v:fmtF(maxGasto), c:maxGasto>0?'var(--green)':'var(--red)'},
+    {l:'Máximo disponible para gastar', sub:'Ingresos - ahorro - fijos', v:fmtF(margenReal < 0 ? margenReal : maxGasto), c:margenReal>=0?'var(--green)':'var(--red)'},
   ].map(function(r){
     return '<div class="bud-row"><div><div class="bud-lbl">'+r.l+'</div>'+(r.sub?'<div class="bud-lbl-sub">'+r.sub+'</div>':'')+'</div><div class="bud-val" style="color:'+r.c+'">'+r.v+'</div></div>';
   }).join('');
 
   var dispEl = document.getElementById('bud-disponible');
   dispEl.innerHTML = '<div class="bud-bar-wrap">'
-    + '<div class="bud-bar-lbl"><span>Gastado libre: '+fmtF(gastadoLibre)+'</span><span>Maximo: '+fmtF(maxGasto)+'</span></div>'
-    + '<div class="bud-bar-track"><div class="bud-bar-fill" style="width:'+pctUsado+'%;background:'+barColor+';"></div></div>'
+    + '<div class="bud-bar-lbl"><span>Gastado libre: '+fmtF(gastadoLibre)+'</span><span>Máximo: '+fmtF(maxGasto)+'</span></div>'
+    + '<div class="bud-bar-track"><div class="bud-bar-fill" style="width:'+pctBarra+'%;background:'+barColor+';"></div></div>'
     + '</div>'
     + '<div class="bud-alert '+alertClass+'">'+alertMsg+'</div>';
 
@@ -1147,8 +1307,6 @@ function renderBudget() {
     }).join('');
   }
 }
-
-
 
 // ── HEATMAP ──────────────────────────────────────────────────────────────────
 var hmYear = new Date().getFullYear();
@@ -1169,7 +1327,7 @@ function renderHeatmap() {
     return '<div style="text-align:center;font-size:9px;color:var(--text3);font-weight:500;">'+d+'</div>';
   }).join('');
 
-  // Build activity map per day per type
+  // Build activity map per day
   var dayMap = {};
   var d = DB[monthKey];
   if (d) {
@@ -1185,32 +1343,31 @@ function renderHeatmap() {
     });
   }
 
-  // Max total for intensity scaling
   var totals = Object.values(dayMap).map(function(x){return x.total;});
   var maxVal = totals.length ? Math.max.apply(null, totals) : 1;
 
-  // Color per dominant type
-  // ingreso=green, gasto+deuda=red/orange, inversion=blue
   function getDayColor(data, intensity) {
-    if (!data || data.total === 0) return '#1a1a2e'; // empty gray
+    if (!data || data.total === 0) return '#16162a';
     var g = data.ingreso;
     var r = data.gasto + data.deuda;
     var b = data.inversion;
     var dom = Math.max(g, r, b);
-    // intensity 1-5
-    var t = intensity; // 1=lightest, 5=darkest
+    var t = intensity;
     if (dom === g) {
-      // green ramp
       var greens = ['#0f3323','#145c35','#1a8048','#1cb865','#22c48a'];
       return greens[t-1];
     } else if (dom === b) {
-      // blue ramp
       var blues = ['#0d2035','#122a50','#1a3d70','#1f5299','#5ab4f0'];
       return blues[t-1];
     } else {
-      // red/orange ramp
-      var reds = ['#3a1515','#6b1e1e','#a02020','#d04020','#f05a30'];
-      return reds[t-1];
+      // Separar: gastos=naranja, deudas=rojo
+      if (data.gasto >= data.deuda) {
+        var oranges = ['#3a2004','#6b3a08','#9a5210','#c47020','#f0a832'];
+        return oranges[t-1];
+      } else {
+        var reds = ['#3a1515','#6b1e1e','#a02020','#d04020','#f05a30'];
+        return reds[t-1];
+      }
     }
   }
 
@@ -1226,6 +1383,17 @@ function renderHeatmap() {
   var firstDay = new Date(hmYear, hmMonth, 1).getDay();
   var daysInMonth = new Date(hmYear, hmMonth+1, 0).getDate();
   var now = new Date();
+
+  // Build factura flags map for this month
+  var facturaFlagMap = {}; // dateStr -> {pending: bool, done: bool}
+  FACTURAS.forEach(function(f){
+    var dateStr = facturaDateStr(f, monthKey);
+    if (!dateStr) return;
+    var done = isFacturaDoneInMonth(f, monthKey);
+    if (!facturaFlagMap[dateStr]) facturaFlagMap[dateStr] = {pending:false, done:false};
+    if (done) facturaFlagMap[dateStr].done = true;
+    else facturaFlagMap[dateStr].pending = true;
+  });
 
   var cells = [];
   for (var i = 0; i < firstDay; i++) {
@@ -1243,12 +1411,26 @@ function renderHeatmap() {
     var mixed = hasMixed(data);
     var dotHtml = mixed ? '<div style="width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.7);position:absolute;bottom:2px;right:2px;"></div>' : '';
 
+    // Factura flag
+    var flagHtml = '';
+    var ff = facturaFlagMap[dateStr];
+    if (ff) {
+      if (ff.pending) {
+        // Orange flag for pending
+        flagHtml = '<div class="hm-cell-flag" style="background:#f0a832;"></div>';
+      } else if (ff.done && !ff.pending) {
+        // Green flag when all done
+        flagHtml = '<div class="hm-cell-flag" style="background:var(--green);"></div>';
+      }
+    }
+
     cells.push('<div data-date="'+dateStr+'" data-day="'+day+'" '
       +'style="aspect-ratio:1;border-radius:4px;background:'+bg+';border:'+border
-      +';cursor:'+(val>0?'pointer':'default')+';display:flex;align-items:center;justify-content:center;position:relative;" '
+      +';cursor:'+(val>0||ff?'pointer':'default')+';display:flex;align-items:center;justify-content:center;position:relative;" '
       +'class="hm-cell">'
       +'<span style="font-size:8px;color:'+(intensity>=3?'#fff':'var(--text3)')+';">'+day+'</span>'
       +dotHtml
+      +flagHtml
       +'</div>');
   }
 
@@ -1260,10 +1442,7 @@ function renderHeatmap() {
       var date = this.dataset.date;
       var day = this.dataset.day;
       var data = dayMap[date];
-      if (!data || data.total === 0) {
-        detailEl.innerHTML = '<span style="color:var(--text3);">'+day+' '+MES[hmMonth]+' — Sin movimientos</span>';
-        return;
-      }
+      var ff2 = facturaFlagMap[date];
 
       var secCfg = [
         {sec:'gano',    label:'Lo que gano',    col:'var(--green)'},
@@ -1274,8 +1453,36 @@ function renderHeatmap() {
 
       var html2 = '<div style="margin-bottom:6px;"><b style="color:var(--text);font-size:12px;">'+day+' de '+MES[hmMonth]+'</b></div>';
 
-      var d2 = DB[monthKey];
       var hasAny = false;
+
+      // Show facturas for this day
+      if (ff2) {
+        var facturasHoy = FACTURAS.filter(function(f){ return facturaDateStr(f, monthKey)===date; });
+        if (facturasHoy.length) {
+          hasAny = true;
+          html2 += '<div style="margin-bottom:6px;">'
+            + '<div style="font-size:10px;color:#f0a832;text-transform:uppercase;letter-spacing:0.5px;font-weight:500;margin-bottom:3px;">🏷 Facturas</div>';
+          facturasHoy.forEach(function(f){
+            var done2 = isFacturaDoneInMonth(f, monthKey);
+            html2 += '<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid var(--border);">'
+              + '<span style="font-size:11px;color:'+(done2?'var(--text3)':'var(--text2)');+';'+(done2?'text-decoration:line-through;':'')+'">'+escapeHtml(f.name)+'</span>'
+              + '<span style="font-size:10px;color:'+(done2?'var(--green)':'#f0a832')+';">'+(done2?'✓ Pagada':'Pendiente')+'</span>'
+              + '</div>';
+          });
+          html2 += '</div>';
+        }
+      }
+
+      if (!data || data.total === 0) {
+        if (!hasAny) {
+          detailEl.innerHTML = '<span style="color:var(--text3);">'+day+' '+MES[hmMonth]+' — Sin movimientos</span>';
+        } else {
+          detailEl.innerHTML = html2;
+        }
+        return;
+      }
+
+      var d2 = DB[monthKey];
       secCfg.forEach(function(cfg){
         var items = (d2 && d2[cfg.sec] ? d2[cfg.sec] : []).filter(function(it){ return it.fecha === date; });
         if (!items.length) return;
@@ -1299,10 +1506,11 @@ function renderHeatmap() {
   document.getElementById('hm-legend').innerHTML =
     '<div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:2px;background:#22c48a;"></div><span>Ingresos</span></div>'
     +'<div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:2px;background:#5ab4f0;"></div><span>Inversión</span></div>'
-    +'<div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:2px;background:#f05a30;"></div><span>Gastos/Deudas</span></div>'
-    +'<div style="display:flex;align-items:center;gap:5px;"><div style="width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.7);margin-left:3px;"></div><span>Mixto</span></div>';
+    +'<div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:2px;background:#f0a832;"></div><span>Gastos</span></div>'
+    +'<div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:2px;background:#f05a30;"></div><span>Deudas</span></div>'
+    +'<div style="display:flex;align-items:center;gap:5px;"><div class="hm-cell-flag" style="position:relative;width:8px;height:9px;background:#f0a832;display:inline-block;clip-path:polygon(0 0,100% 0,100% 65%,50% 100%,0 65%);"></div><span>Factura pendiente</span></div>'
+    +'<div style="display:flex;align-items:center;gap:5px;"><div class="hm-cell-flag" style="position:relative;width:8px;height:9px;background:var(--green);display:inline-block;clip-path:polygon(0 0,100% 0,100% 65%,50% 100%,0 65%);"></div><span>Factura pagada</span></div>';
 
-  // Nav buttons
   var nextBtn = document.getElementById('hm-next');
   if (nextBtn) {
     var blocked = hmYear > now.getFullYear() || (hmYear===now.getFullYear() && hmMonth>=now.getMonth());
@@ -1319,14 +1527,12 @@ function renderGrowthChart() {
   var canvas = document.getElementById('growth-chart');
   if (!canvas) return;
 
-  // Build data: balance per month
   var labels = keys.map(function(k){ return k.split(' ')[0].substring(0,3)+' '+k.split(' ')[1]; });
   var balances = keys.map(function(k){
     var d = DB[k];
     return sum(d.gano) - sum(d.debo) + sum(d.invierto) - sum(d.consumo);
   });
 
-  // Trend line (simple moving average)
   var trend = balances.map(function(v,i){
     var slice = balances.slice(Math.max(0,i-1), i+2);
     return slice.reduce(function(a,b){return a+b;},0)/slice.length;
@@ -1408,13 +1614,157 @@ function renderGrowthChart() {
   });
 }
 
-// Notifications
-// Register Service Worker
+// ── IMPORT / EXPORT ──────────────────────────────────────────────────────────
+function showImportModal() {
+  var ex = document.getElementById('import-modal'); if(ex) ex.remove();
+  var div = document.createElement('div');
+  div.className = 'modal-bg'; div.id = 'import-modal';
+  div.innerHTML = '<div class="modal-box">'
+    + '<h3>Importar datos</h3>'
+    + '<p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5;">Pega aqui el texto que exportaste anteriormente. Tus datos actuales seran reemplazados.</p>'
+    + '<textarea id="import-ta" style="width:100%;height:140px;font-size:11px;padding:10px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg3);color:var(--text);resize:none;font-family:var(--font-sans);line-height:1.5;" placeholder="Pega aqui el texto exportado..."></textarea>'
+    + '<div id="import-err" style="font-size:11px;color:var(--red);margin:6px 0;display:none;"></div>'
+    + '<div class="mbtns" style="margin-top:10px;">'
+    + '<button class="mbtn-c" id="import-cancel">Cancelar</button>'
+    + '<button class="mbtn-ok" id="import-ok" style="background:var(--green);">Restaurar</button>'
+    + '</div></div>';
+  document.body.appendChild(div);
+  div.querySelector('#import-cancel').addEventListener('click', function(){ div.remove(); });
+  div.querySelector('#import-ok').addEventListener('click', function(){ doImport(); });
+}
+
+function doImport() {
+  var text = (document.getElementById('import-ta').value || '').trim();
+  var errEl = document.getElementById('import-err');
+  if (!text) { errEl.textContent = 'Pega el texto exportado primero.'; errEl.style.display='block'; return; }
+
+  try {
+    var newDB = {};
+    var newFacturas = null;
+    text = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+    var lines = text.split('\n');
+    var curKey = null;
+    var curSec = null;
+    var inFacturas = false;
+
+    lines.forEach(function(line) {
+      line = line.trim();
+      if (!line) return;
+
+      // Facturas section
+      if (/^FACTURAS_JSON:/i.test(line)) {
+        var jsonStr = line.replace(/^FACTURAS_JSON:/i,'').trim();
+        try { newFacturas = JSON.parse(jsonStr); } catch(e) {}
+        return;
+      }
+
+      var mMatch = line.match(/^===\s*(.+?)\s*===$/);
+      if (mMatch) {
+        curKey = mMatch[1];
+        newDB[curKey] = {gano:[],debo:[],invierto:[],consumo:[],notes:''};
+        curSec = null;
+        return;
+      }
+      if (!curKey) return;
+
+      if (/^INGRESOS:/i.test(line)) { curSec = 'gano'; return; }
+      if (/^DEUDAS:/i.test(line)) { curSec = 'debo'; return; }
+      if (/^INVERSION:/i.test(line)) { curSec = 'invierto'; return; }
+      if (/^CONSUMO:/i.test(line)) { curSec = 'consumo'; return; }
+      if (/^BALANCE:/i.test(line) || /^Moneda:/i.test(line) || /^DGO Capital/i.test(line)) { curSec = null; return; }
+      if (/^NOTAS:/i.test(line)) {
+        newDB[curKey].notes = line.replace(/^NOTAS:/i,'').trim();
+        curSec = null; return;
+      }
+
+      if (curSec) {
+        var lastColon = line.lastIndexOf(':');
+        if (lastColon < 1) return;
+        var desc = line.substring(0, lastColon).trim();
+        var valRaw = line.substring(lastColon+1).trim();
+        if (!valRaw.match(/^-?\s*\$?\s*[\d]/)) return;
+        var valStr = valRaw.replace(/\$/g,'').replace(/\s/g,'');
+        if (valStr.indexOf(',') >= 0) {
+          valStr = valStr.replace(/\./g,'').replace(',','.');
+        } else {
+          valStr = valStr.replace(/\./g,'');
+        }
+        var tipo = 'normal';
+        var tipoMatch = valRaw.match(/\[(fijo|comun)\]/i);
+        if (tipoMatch) {
+          tipo = tipoMatch[1].toLowerCase();
+          valStr = valStr.replace(/\[.*?\]/g,'').trim();
+        }
+        var val = parseFloat(valStr) || 0;
+        if (desc && val >= 0) newDB[curKey][curSec].push({desc:desc, val:val, tipo:tipo});
+      }
+    });
+
+    var keys = Object.keys(newDB);
+    if (!keys.length) throw new Error('No se encontraron meses en el texto.');
+
+    var cfg = DB._cfg || {};
+    DB = newDB;
+    DB._cfg = cfg;
+    cur = keys[0];
+    saveDB();
+
+    // Restore facturas if present
+    if (newFacturas && Array.isArray(newFacturas)) {
+      FACTURAS = newFacturas;
+      saveFacturas();
+    }
+
+    document.getElementById('import-modal').remove();
+    renderPills();
+    renderCurrent();
+    var msg = 'Datos restaurados correctamente. ' + keys.length + ' mes(es) importados.';
+    if (newFacturas) msg += ' Facturas restauradas.';
+    alert(msg);
+  } catch(e) {
+    errEl.textContent = 'Error al importar: ' + e.message;
+    errEl.style.display = 'block';
+  }
+}
+
+function exportData() {
+  var keys = mkeys();
+  var lines = ['DGO Capital Finance - Exportacion','Moneda: '+CC.code+' ('+CC.symbol+')',''];
+  keys.forEach(function(k){
+    var d = DB[k]; lines.push('=== '+k+' ===');
+    lines.push('INGRESOS: '+fmtF(sum(d.gano))); d.gano.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val)+(it.tipo&&it.tipo!=='normal'?' ['+it.tipo+']':''));});
+    lines.push('DEUDAS: '+fmtF(sum(d.debo))); d.debo.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val)+(it.tipo&&it.tipo!=='normal'?' ['+it.tipo+']':''));});
+    lines.push('INVERSION: '+fmtF(sum(d.invierto))); d.invierto.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val)+(it.tipo&&it.tipo!=='normal'?' ['+it.tipo+']':''));});
+    lines.push('CONSUMO: '+fmtF(sum(d.consumo))); d.consumo.forEach(function(it){lines.push('  '+it.desc+': '+fmtF(it.val)+(it.tipo&&it.tipo!=='normal'?' ['+it.tipo+']':''));});
+    var bg=sum(d.gano)-sum(d.debo)+sum(d.invierto)-sum(d.consumo);
+    lines.push('BALANCE: '+fmtF(bg)); if(d.notes) lines.push('NOTAS: '+d.notes); lines.push('');
+  });
+  // Export facturas as JSON line
+  if (FACTURAS.length) {
+    lines.push('FACTURAS_JSON: ' + JSON.stringify(FACTURAS));
+  }
+  var text = lines.join('\n');
+  if (navigator.share) { navigator.share({title:'DGO Capital',text:text}).catch(function(){}); }
+  else if (navigator.clipboard) { navigator.clipboard.writeText(text).then(function(){alert('Datos copiados');}).catch(function(){alert(text);}); }
+  else { alert(text); }
+}
+
+function confirmClear() {
+  if (confirm('Borrar TODOS los datos? No se puede deshacer.')) {
+    localStorage.removeItem(KEY);
+    localStorage.removeItem(FACTURAS_KEY);
+    DB = {}; FACTURAS = [];
+    var now = new Date(); var k = MES[now.getMonth()]+' '+now.getFullYear();
+    DB[k] = emptyMonth(); DB._cfg = {currency:'COP'}; CC = CURRENCIES[0];
+    cur = k; saveDB(); updateCurrencyUI(); renderPills(); renderCurrent(); goView('registro');
+  }
+}
+
+// ── NOTIFICATIONS ─────────────────────────────────────────────────────────────
 function registerSW() {
   if (!('serviceWorker' in navigator)) return;
   navigator.serviceWorker.register('sw.js').then(function(reg) {
     console.log('SW registered');
-    // If notif time saved, resend schedule to SW
     if (DB._cfg && DB._cfg.notifTime && Notification.permission === 'granted') {
       sendScheduleToSW(DB._cfg.notifTime);
     }
@@ -1436,7 +1786,6 @@ function initNotification() {
   var statusEl = document.getElementById('notif-status');
   if (!timeEl) return;
   if (saved) timeEl.value = saved;
-
   if (!('Notification' in window)) {
     showNotifStatus('Tu navegador no soporta notificaciones', 'err');
     return;
@@ -1467,19 +1816,12 @@ function scheduleNotification(timeStr) {
     if (!DB._cfg) DB._cfg = {};
     DB._cfg.notifTime = timeStr;
     saveDB();
-    // Send to Service Worker for background delivery
     sendScheduleToSW(timeStr);
-    // Also keep JS timer as fallback when app is open
-    triggerDailyNotif(timeStr);
     showNotifStatus('Recordatorio activo a las ' + timeStr + '. Funciona en segundo plano.', 'ok');
   });
 }
 
-function triggerDailyNotif(timeStr) {
-  // Handled entirely by Service Worker - no JS timer to avoid duplicates
-}
-
-
+// ── IA ────────────────────────────────────────────────────────────────────────
 var iaScope = 'mes';
 
 function setScope(s) {
@@ -1543,11 +1885,9 @@ function abrirEnClaude() {
   var prompt = buildAnalysisPrompt(iaScope);
   if (!prompt) return;
 
-  // Try to open claude.ai with the message pre-filled
   var encoded = encodeURIComponent(prompt);
   var url = 'https://claude.ai/new?q=' + encoded;
 
-  // If URL is too long (>2000 chars), copy to clipboard and open claude.ai
   if (url.length > 2000) {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(prompt).then(function() {
@@ -1564,7 +1904,10 @@ function abrirEnClaude() {
   }
 }
 
+// ── EVENT LISTENERS ──────────────────────────────────────────────────────────
 document.getElementById('btn-add-month').addEventListener('click', showAddMonth);
+document.getElementById('btn-hide-balance').addEventListener('click', toggleHideBalance);
+document.getElementById('btn-open-facturas').addEventListener('click', showFacturasModal);
 document.getElementById('hm-prev').addEventListener('click', function(){
   hmMonth--; if(hmMonth<0){hmMonth=11;hmYear--;} renderHeatmap();
 });
@@ -1602,10 +1945,10 @@ document.getElementById('notes-ta').addEventListener('input', function(){ DB[cur
   document.getElementById('v-'+sec).addEventListener('keydown', function(e){if(e.key==='Enter')addItem(sec);});
 });
 
+// ── INIT ─────────────────────────────────────────────────────────────────────
 loadDB();
+loadFacturas();
 registerSW();
-// SW handles background notifications - no JS timer needed
-// Restore saved savePct into input
 var budPctEl = document.getElementById('bud-pct');
 if(budPctEl && DB._cfg && DB._cfg.savePct) {
   budPctEl.value = DB._cfg.savePct;
