@@ -454,7 +454,7 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
           <div class="pgstat"><div class="pgstat-label">Total consumido</div><div class="pgstat-val" style="color:var(--amber)" id="d-tot-con">$ 0</div><div class="pgstat-sub" id="d-avg-con">Prom: $ 0/mes</div></div>
         </div>
       </div>
-      <div class="chart-card"><div class="chart-title">Balance por mes</div><div class="bar-chart" id="bars-balance"></div></div>
+
       <div class="chart-card"><div class="chart-title">Distribucion promedio</div><div class="bar-chart" id="bars-dist"></div></div>
       <div class="chart-card" style="padding:0;overflow:hidden;">
         <div style="padding:13px 15px;border-bottom:1px solid var(--border);font-family:'Syne',sans-serif;font-size:13px;font-weight:600;">Resumen mensual</div>
@@ -484,7 +484,7 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
         <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px;" id="hm-days-header"></div>
         <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;" id="hm-grid"></div>
         <div id="hm-legend" style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;font-size:9px;color:var(--text3);"></div>
-        <div id="hm-detail" style="margin-top:10px;font-size:11px;color:var(--text2);min-height:20px;"></div>
+        <div id="hm-detail" style="margin-top:10px;font-size:11px;color:var(--text2);min-height:20px;max-height:200px;overflow-y:auto;"></div>
       </div>
     </div>
     <div style="height:6px;"></div>
@@ -846,13 +846,7 @@ function renderDash() {
   document.getElementById('d-tot-debo').textContent=fmt(tD); document.getElementById('d-avg-debo').textContent='Prom: '+fmt(tD/n)+'/mes';
   document.getElementById('d-tot-inv').textContent=fmt(tI); document.getElementById('d-avg-inv').textContent='Prom: '+fmt(tI/n)+'/mes';
   document.getElementById('d-tot-con').textContent=fmt(tC); document.getElementById('d-avg-con').textContent='Prom: '+fmt(tC/n)+'/mes';
-  var bals = keys.map(function(k){ var d=DB[k]; return {k:k,v:sum(d.gano)-sum(d.debo)+sum(d.invierto)-sum(d.consumo)}; });
-  var maxB = Math.max.apply(null, bals.map(function(x){return Math.abs(x.v);})); maxB = maxB||1;
-  document.getElementById('bars-balance').innerHTML = bals.map(function(b){
-    var pct=Math.round(Math.abs(b.v)/maxB*100), col=b.v>=0?'var(--green)':'var(--red)';
-    var ks = b.k.split(' ')[0].substring(0,3)+' '+b.k.split(' ')[1];
-    return '<div class="bar-row"><div class="bar-lbl" title="'+b.k+'">'+ks+'</div><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:'+col+';"></div></div><div class="bar-val" style="color:'+col+'">'+fmt(b.v)+'</div></div>';
-  }).join('');
+
   var cats = [{l:'Ingresos',v:tG/n,c:'var(--green)'},{l:'Inversion',v:tI/n,c:'var(--blue)'},{l:'Consumo',v:tC/n,c:'var(--amber)'},{l:'Deudas',v:tD/n,c:'var(--red)'}];
   var maxC = Math.max.apply(null, cats.map(function(x){return x.v;})); maxC=maxC||1;
   document.getElementById('bars-dist').innerHTML = cats.map(function(c){
@@ -1266,16 +1260,38 @@ function renderHeatmap() {
       var date = this.dataset.date;
       var day = this.dataset.day;
       var data = dayMap[date];
-      if (!data || data.total === 0) { detailEl.textContent = day+' — Sin movimientos'; return; }
+      if (!data || data.total === 0) {
+        detailEl.innerHTML = '<span style="color:var(--text3);">'+day+' '+MES[hmMonth]+' — Sin movimientos</span>';
+        return;
+      }
 
-      var parts = [];
-      if (data.ingreso > 0) parts.push('<span style="color:var(--green)">+'+fmtF(data.ingreso)+' ingresos</span>');
-      if (data.inversion > 0) parts.push('<span style="color:var(--blue)">+'+fmtF(data.inversion)+' inversión</span>');
-      if (data.gasto > 0) parts.push('<span style="color:var(--amber)">-'+fmtF(data.gasto)+' gastos</span>');
-      if (data.deuda > 0) parts.push('<span style="color:var(--red)">-'+fmtF(data.deuda)+' deudas</span>');
+      var secCfg = [
+        {sec:'gano',    label:'Lo que gano',    col:'var(--green)'},
+        {sec:'invierto',label:'Lo que invierto', col:'var(--blue)'},
+        {sec:'debo',    label:'Lo que debo',     col:'var(--red)'},
+        {sec:'consumo', label:'Lo que consumo',  col:'var(--amber)'},
+      ];
 
-      detailEl.innerHTML = '<b style="color:var(--text);">'+day+' '+MES[hmMonth]+'</b> &nbsp;'
-        + parts.join(' &nbsp; ');
+      var html2 = '<div style="margin-bottom:6px;"><b style="color:var(--text);font-size:12px;">'+day+' de '+MES[hmMonth]+'</b></div>';
+
+      var d2 = DB[monthKey];
+      var hasAny = false;
+      secCfg.forEach(function(cfg){
+        var items = (d2 && d2[cfg.sec] ? d2[cfg.sec] : []).filter(function(it){ return it.fecha === date; });
+        if (!items.length) return;
+        hasAny = true;
+        html2 += '<div style="margin-bottom:6px;">'
+          + '<div style="font-size:10px;color:'+cfg.col+';text-transform:uppercase;letter-spacing:0.5px;font-weight:500;margin-bottom:3px;">'+cfg.label+'</div>';
+        items.forEach(function(it){
+          html2 += '<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid var(--border);">'
+            + '<span style="font-size:11px;color:var(--text2);">'+it.desc+'</span>'
+            + '<span style="font-size:11px;font-weight:500;color:'+cfg.col+';">'+fmtF(it.val)+'</span>'
+            + '</div>';
+        });
+        html2 += '</div>';
+      });
+
+      detailEl.innerHTML = html2;
     });
   });
 
