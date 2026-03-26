@@ -276,6 +276,21 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
 
 /* Flag en heatmap cell */
 .hm-cell-flag{position:absolute;top:1px;right:1px;width:5px;height:6px;clip-path:polygon(0 0,100% 0,100% 65%,50% 100%,0 65%);}
+
+/* Comprobantes */
+.comp-btn{display:inline-flex;align-items:center;gap:5px;font-size:10px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer;margin-top:4px;white-space:nowrap;}
+.comp-btn.has-comp{border-color:var(--accent);color:var(--accent2);background:var(--accent-dim);}
+.comp-btn:active{opacity:0.7;}
+.comp-thumb{width:48px;height:48px;border-radius:8px;object-fit:cover;cursor:pointer;border:1px solid var(--border);flex-shrink:0;}
+.comp-thumb:active{opacity:0.8;}
+.comp-viewer{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.comp-viewer img{max-width:100%;max-height:85vh;border-radius:8px;object-fit:contain;}
+.comp-viewer-bar{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:max(16px,calc(env(safe-area-inset-top)+10px)) 16px 12px;background:linear-gradient(to bottom,rgba(0,0,0,0.7),transparent);}
+.comp-viewer-title{font-size:13px;font-weight:600;color:#fff;}
+.comp-viewer-close{width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,0.2);background:rgba(0,0,0,0.4);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.comp-viewer-del{font-size:11px;padding:6px 14px;border-radius:20px;border:1px solid var(--red-soft);background:transparent;color:var(--red);cursor:pointer;}
+/* hidden file input */
+.file-inp-hidden{display:none;}
 </style>
 </head>
 <body>
@@ -1056,6 +1071,154 @@ function saveEdit(sec, idx) {
   renderBudget();
 }
 
+// ── INDEXEDDB — COMPROBANTES ─────────────────────────────────────────────────
+// Stores: comprobantes — key: "facturaId_monthKey" → {fid, monthKey, dataUrl, name, savedAt}
+var IDB_NAME = 'dgocapital_idb';
+var IDB_VER  = 1;
+var IDB_STORE = 'comprobantes';
+var idb = null;
+
+function openIDB() {
+  return new Promise(function(resolve, reject) {
+    if (idb) { resolve(idb); return; }
+    var req = indexedDB.open(IDB_NAME, IDB_VER);
+    req.onupgradeneeded = function(e) {
+      var db = e.target.result;
+      if (!db.objectStoreNames.contains(IDB_STORE)) {
+        db.createObjectStore(IDB_STORE, {keyPath: 'key'});
+      }
+    };
+    req.onsuccess = function(e) { idb = e.target.result; resolve(idb); };
+    req.onerror   = function(e) { reject(e); };
+  });
+}
+
+function idbKey(fid, monthKey) { return fid + '||' + monthKey; }
+
+function saveComprobante(fid, monthKey, dataUrl, name) {
+  return openIDB().then(function(db) {
+    return new Promise(function(resolve, reject) {
+      var tx = db.transaction(IDB_STORE, 'readwrite');
+      var st = tx.objectStore(IDB_STORE);
+      st.put({key: idbKey(fid, monthKey), fid: fid, monthKey: monthKey, dataUrl: dataUrl, name: name, savedAt: Date.now()});
+      tx.oncomplete = resolve;
+      tx.onerror = reject;
+    });
+  });
+}
+
+function getComprobante(fid, monthKey) {
+  return openIDB().then(function(db) {
+    return new Promise(function(resolve, reject) {
+      var tx = db.transaction(IDB_STORE, 'readonly');
+      var req = tx.objectStore(IDB_STORE).get(idbKey(fid, monthKey));
+      req.onsuccess = function() { resolve(req.result || null); };
+      req.onerror   = reject;
+    });
+  });
+}
+
+function deleteComprobante(fid, monthKey) {
+  return openIDB().then(function(db) {
+    return new Promise(function(resolve, reject) {
+      var tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).delete(idbKey(fid, monthKey));
+      tx.oncomplete = resolve;
+      tx.onerror = reject;
+    });
+  });
+}
+
+// Get all comprobante keys (for export awareness)
+function getAllComprobantes() {
+  return openIDB().then(function(db) {
+    return new Promise(function(resolve, reject) {
+      var tx = db.transaction(IDB_STORE, 'readonly');
+      var req = tx.objectStore(IDB_STORE).getAll();
+      req.onsuccess = function() { resolve(req.result || []); };
+      req.onerror   = reject;
+    });
+  });
+}
+
+// Delete all comprobantes (used on clear all data)
+function deleteAllComprobantes() {
+  return openIDB().then(function(db) {
+    return new Promise(function(resolve, reject) {
+      var tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).clear();
+      tx.oncomplete = resolve;
+      tx.onerror = reject;
+    });
+  });
+}
+
+// Compress image to max 900px, quality 0.65, returns dataUrl
+function compressImage(file, callback) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var maxW = 900, maxH = 900;
+      var w = img.width, h = img.height;
+      if (w > maxW || h > maxH) {
+        var ratio = Math.min(maxW/w, maxH/h);
+        w = Math.round(w * ratio);
+        h = Math.round(h * ratio);
+      }
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/jpeg', 0.65));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── COMPROBANTE UI ───────────────────────────────────────────────────────────
+function showComprobanteViewer(dataUrl, title, fid, monthKey, onDelete) {
+  var ex = document.getElementById('comp-viewer-div'); if(ex) ex.remove();
+  var div = document.createElement('div');
+  div.className = 'comp-viewer'; div.id = 'comp-viewer-div';
+  div.innerHTML = '<div class="comp-viewer-bar">'
+    + '<span class="comp-viewer-title">'+escapeHtml(title)+'</span>'
+    + '<div style="display:flex;gap:8px;align-items:center;">'
+    + '<button class="comp-viewer-del" id="cv-del">Eliminar</button>'
+    + '<button class="comp-viewer-close" id="cv-close">&#215;</button>'
+    + '</div></div>'
+    + '<img src="'+dataUrl+'" alt="Comprobante"/>';
+  document.body.appendChild(div);
+  div.querySelector('#cv-close').addEventListener('click', function(){ div.remove(); });
+  div.addEventListener('click', function(e){ if(e.target===div) div.remove(); });
+  div.querySelector('#cv-del').addEventListener('click', function(){
+    if (!confirm('¿Eliminar este comprobante?')) return;
+    deleteComprobante(fid, monthKey).then(function(){
+      div.remove();
+      if (onDelete) onDelete();
+    });
+  });
+}
+
+// Attach comprobante flow: opens file picker, compresses, saves, refreshes UI
+function attachComprobante(fid, monthKey, facturaNombre, onDone) {
+  var inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*'; inp.capture = 'environment';
+  inp.className = 'file-inp-hidden';
+  document.body.appendChild(inp);
+  inp.addEventListener('change', function(){
+    var file = inp.files && inp.files[0];
+    inp.remove();
+    if (!file) return;
+    compressImage(file, function(dataUrl){
+      saveComprobante(fid, monthKey, dataUrl, facturaNombre).then(function(){
+        if (onDone) onDone(dataUrl);
+      });
+    });
+  });
+  inp.click();
+}
+
 // ── MODAL GESTIÓN DE FACTURAS ────────────────────────────────────────────────
 function showFacturasModal() {
   var ex = document.getElementById('facturas-modal'); if(ex) ex.remove();
@@ -1068,11 +1231,12 @@ function showFacturasModal() {
   div.innerHTML = buildFacturasModalHTML(monthKey);
   document.body.appendChild(div);
   wireFacturasModal(div, monthKey);
+  // Load comprobante thumbnails async
+  renderComprobanteThumbsInModal(monthKey);
 }
 
 function buildFacturasModalHTML(monthKey) {
   var res = getFacturasForMonth(monthKey);
-
   var itemsHTML = '';
   var allItems = res.pending.concat(res.done);
 
@@ -1092,6 +1256,7 @@ function buildFacturasModalHTML(monthKey) {
         + '<div class="factura-info">'
         + '<div class="factura-name ' + (done?'done':'') + '">' + escapeHtml(f.name) + '</div>'
         + '<div class="factura-date">' + diaLabel + '</div>'
+        + (done ? '<div class="comp-area" data-fid="'+f.id+'" data-month="'+monthKey+'" data-name="'+escapeHtml(f.name)+'"><button class="comp-btn" data-action="attach" data-fid="'+f.id+'" data-month="'+monthKey+'" data-name="'+escapeHtml(f.name)+'">📎 Adjuntar comprobante</button></div>' : '')
         + '</div>'
         + '<button class="factura-del" data-fid="' + f.id + '">&#215;</button>'
         + '</div>';
@@ -1099,7 +1264,7 @@ function buildFacturasModalHTML(monthKey) {
   }
 
   return '<div class="modal-box scroll"><h3>&#127987; Gestión de Facturas</h3>'
-    + '<div style="font-size:11px;color:var(--text3);margin-bottom:14px;line-height:1.5;">Las facturas se repiten automáticamente cada mes. Márcalas como pagadas cuando las ejecutes.</div>'
+    + '<div style="font-size:11px;color:var(--text3);margin-bottom:14px;line-height:1.5;">Las facturas se repiten automáticamente cada mes. Márcalas como pagadas y adjunta el comprobante.</div>'
     + '<div id="facturas-list">' + itemsHTML + '</div>'
     + '<div style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">'
     + '<div style="font-size:11px;color:var(--text2);font-weight:600;margin-bottom:8px;">Agregar nueva factura</div>'
@@ -1167,10 +1332,92 @@ function wireFacturasListEvents(div, monthKey) {
       var fid = this.dataset.fid;
       var idx = FACTURAS.findIndex(function(x){return x.id===fid;});
       if (idx >= 0) {
+        // Also delete any comprobante for this factura
+        deleteComprobante(fid, monthKey).catch(function(){});
         FACTURAS.splice(idx, 1);
         saveFacturas();
         refreshFacturasListInModal(monthKey);
         updateFacturasBtnSub();
+      }
+    });
+  });
+
+  // Comprobante attach/view buttons
+  div.querySelectorAll('.comp-btn[data-action="attach"]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var fid = this.dataset.fid;
+      var mk = this.dataset.month;
+      var name = this.dataset.name;
+      attachComprobante(fid, mk, name, function(dataUrl){
+        refreshFacturasListInModal(mk);
+      });
+    });
+  });
+
+  div.querySelectorAll('.comp-btn[data-action="view"]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var fid = this.dataset.fid;
+      var mk = this.dataset.month;
+      var name = this.dataset.name;
+      getComprobante(fid, mk).then(function(rec){
+        if (!rec) return;
+        showComprobanteViewer(rec.dataUrl, name, fid, mk, function(){
+          refreshFacturasListInModal(mk);
+        });
+      });
+    });
+  });
+
+  div.querySelectorAll('img.comp-thumb').forEach(function(img){
+    img.addEventListener('click', function(){
+      var fid = this.dataset.fid;
+      var mk = this.dataset.month;
+      var name = this.dataset.name;
+      showComprobanteViewer(this.src, name, fid, mk, function(){
+        refreshFacturasListInModal(mk);
+      });
+    });
+  });
+}
+
+// Load thumbnails async into modal comp-areas
+function renderComprobanteThumbsInModal(monthKey) {
+  var areas = document.querySelectorAll('.comp-area');
+  areas.forEach(function(area){
+    var fid = area.dataset.fid;
+    var mk = area.dataset.month;
+    var name = area.dataset.name;
+    getComprobante(fid, mk).then(function(rec){
+      if (!rec) return;
+      // Replace button with thumbnail + change button
+      area.innerHTML = '<div style="display:flex;align-items:center;gap:8px;margin-top:4px;">'
+        + '<img class="comp-thumb" src="'+rec.dataUrl+'" data-fid="'+fid+'" data-month="'+mk+'" data-name="'+escapeHtml(name)+'" alt="Comprobante"/>'
+        + '<div style="display:flex;flex-direction:column;gap:4px;">'
+        + '<button class="comp-btn has-comp" data-action="view" data-fid="'+fid+'" data-month="'+mk+'" data-name="'+escapeHtml(name)+'">🔍 Ver comprobante</button>'
+        + '<button class="comp-btn" data-action="attach" data-fid="'+fid+'" data-month="'+mk+'" data-name="'+escapeHtml(name)+'">🔄 Cambiar</button>'
+        + '</div></div>';
+      // Re-wire only this area's buttons
+      var modalDiv = document.getElementById('facturas-modal');
+      if (modalDiv) {
+        area.querySelectorAll('.comp-btn[data-action="view"]').forEach(function(btn){
+          btn.addEventListener('click', function(){
+            getComprobante(fid, mk).then(function(r){
+              if(r) showComprobanteViewer(r.dataUrl, name, fid, mk, function(){ refreshFacturasListInModal(mk); });
+            });
+          });
+        });
+        area.querySelectorAll('.comp-btn[data-action="attach"]').forEach(function(btn){
+          btn.addEventListener('click', function(){
+            attachComprobante(fid, mk, name, function(){ refreshFacturasListInModal(mk); });
+          });
+        });
+        area.querySelectorAll('img.comp-thumb').forEach(function(img){
+          img.addEventListener('click', function(){
+            getComprobante(fid, mk).then(function(r){
+              if(r) showComprobanteViewer(r.dataUrl, name, fid, mk, function(){ refreshFacturasListInModal(mk); });
+            });
+          });
+        });
       }
     });
   });
@@ -1196,13 +1443,17 @@ function refreshFacturasListInModal(monthKey) {
       + '<div class="factura-info">'
       + '<div class="factura-name ' + (done?'done':'') + '">' + escapeHtml(f.name) + '</div>'
       + '<div class="factura-date">' + diaLabel + '</div>'
+      + (done ? '<div class="comp-area" data-fid="'+f.id+'" data-month="'+monthKey+'" data-name="'+escapeHtml(f.name)+'"><button class="comp-btn" data-action="attach" data-fid="'+f.id+'" data-month="'+monthKey+'" data-name="'+escapeHtml(f.name)+'">📎 Adjuntar comprobante</button></div>' : '')
       + '</div>'
       + '<button class="factura-del" data-fid="' + f.id + '">&#215;</button>'
       + '</div>';
   });
   listEl.innerHTML = html;
   var modalDiv = document.getElementById('facturas-modal');
-  if (modalDiv) wireFacturasListEvents(modalDiv, monthKey);
+  if (modalDiv) {
+    wireFacturasListEvents(modalDiv, monthKey);
+    renderComprobanteThumbsInModal(monthKey);
+  }
 }
 
 // ── PRESUPUESTO ──────────────────────────────────────────────────────────────
@@ -1435,7 +1686,6 @@ function renderHeatmap() {
       var date = this.dataset.date;
       var day = this.dataset.day;
       var data = dayMap[date];
-      var ff2 = facturaFlagMap[date];
 
       var secCfg = [
         {sec:'gano',    label:'Lo que gano',    col:'var(--green)'},
@@ -1449,21 +1699,22 @@ function renderHeatmap() {
       var hasAny = false;
 
       // Show facturas for this day
-      if (ff2) {
-        var facturasHoy = FACTURAS.filter(function(f){ return facturaDateStr(f, monthKey)===date; });
-        if (facturasHoy.length) {
-          hasAny = true;
-          html2 += '<div style="margin-bottom:6px;">'
-            + '<div style="font-size:10px;color:#f0a832;text-transform:uppercase;letter-spacing:0.5px;font-weight:500;margin-bottom:3px;">🏷 Facturas</div>';
-          facturasHoy.forEach(function(f){
-            var done2 = isFacturaDoneInMonth(f, monthKey);
-            html2 += '<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid var(--border);">'
-              + '<span style="font-size:11px;color:'+(done2?'var(--text3)':'var(--text2)');+';'+(done2?'text-decoration:line-through;':'')+'">'+escapeHtml(f.name)+'</span>'
-              + '<span style="font-size:10px;color:'+(done2?'var(--green)':'#f0a832')+';">'+(done2?'✓ Pagada':'Pendiente')+'</span>'
-              + '</div>';
-          });
-          html2 += '</div>';
-        }
+      var facturasHoy = FACTURAS.filter(function(f){ return facturaDateStr(f, monthKey)===date; });
+      if (facturasHoy.length) {
+        hasAny = true;
+        html2 += '<div style="margin-bottom:8px;">'
+          + '<div style="font-size:10px;color:#7c6ef0;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:5px;">🏷 Facturas del día</div>';
+        facturasHoy.forEach(function(f){
+          var done2 = isFacturaDoneInMonth(f, monthKey);
+          html2 += '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);" id="hm-frow-'+f.id+'">'
+            + '<span style="font-size:12px;font-weight:500;color:'+(done2?'var(--text3)':'var(--text)')+';'+(done2?'text-decoration:line-through;':'')+'">'+escapeHtml(f.name)+'</span>'
+            + '<div style="display:flex;align-items:center;gap:6px;">'
+            + (done2 ? '<span id="hm-comp-'+f.id+'"></span>' : '')
+            + '<span style="font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;background:'+(done2?'var(--green-dim)':'var(--accent-dim)')+';color:'+(done2?'var(--green)':'var(--accent2)');+';">'+(done2?'✓ Pagada':'⏳ Pendiente')+'</span>'
+            + '</div>'
+            + '</div>';
+        });
+        html2 += '</div>';
       }
 
       if (!data || data.total === 0) {
@@ -1471,6 +1722,23 @@ function renderHeatmap() {
           detailEl.innerHTML = '<span style="color:var(--text3);">'+day+' '+MES[hmMonth]+' — Sin movimientos</span>';
         } else {
           detailEl.innerHTML = html2;
+          // Async: load comprobante thumbs even when no financial movements
+          facturasHoy.forEach(function(f){
+            if (!isFacturaDoneInMonth(f, monthKey)) return;
+            var slot = document.getElementById('hm-comp-'+f.id);
+            if (!slot) return;
+            getComprobante(f.id, monthKey).then(function(rec){
+              var s = document.getElementById('hm-comp-'+f.id);
+              if (!s || !rec) return;
+              var img = document.createElement('img');
+              img.src = rec.dataUrl; img.className = 'comp-thumb';
+              img.style.width = '34px'; img.style.height = '34px';
+              img.addEventListener('click', function(){
+                showComprobanteViewer(rec.dataUrl, f.name, f.id, monthKey, function(){ s.innerHTML=''; });
+              });
+              s.innerHTML = ''; s.appendChild(img);
+            });
+          });
         }
         return;
       }
@@ -1492,6 +1760,28 @@ function renderHeatmap() {
       });
 
       detailEl.innerHTML = html2;
+
+      // Async: load comprobante thumbnails for paid facturas on this day
+      facturasHoy.forEach(function(f){
+        if (!isFacturaDoneInMonth(f, monthKey)) return;
+        var slotEl = document.getElementById('hm-comp-'+f.id);
+        if (!slotEl) return;
+        getComprobante(f.id, monthKey).then(function(rec){
+          var slot2 = document.getElementById('hm-comp-'+f.id);
+          if (!slot2) return;
+          if (!rec) { slot2.textContent = ''; return; }
+          var img = document.createElement('img');
+          img.src = rec.dataUrl;
+          img.className = 'comp-thumb';
+          img.style.width = '34px'; img.style.height = '34px';
+          img.addEventListener('click', function(){
+            showComprobanteViewer(rec.dataUrl, f.name, f.id, monthKey, function(){
+              slot2.innerHTML = '';
+            });
+          });
+          slot2.innerHTML = ''; slot2.appendChild(img);
+        });
+      });
     });
   });
 
@@ -1745,6 +2035,7 @@ function confirmClear() {
   if (confirm('Borrar TODOS los datos? No se puede deshacer.')) {
     localStorage.removeItem(KEY);
     localStorage.removeItem(FACTURAS_KEY);
+    deleteAllComprobantes().catch(function(){});
     DB = {}; FACTURAS = [];
     var now = new Date(); var k = MES[now.getMonth()]+' '+now.getFullYear();
     DB[k] = emptyMonth(); DB._cfg = {currency:'COP'}; CC = CURRENCIES[0];
