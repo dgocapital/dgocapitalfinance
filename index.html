@@ -1203,7 +1203,7 @@ function showComprobanteViewer(dataUrl, title, fid, monthKey, onDelete) {
 // Attach comprobante flow: opens file picker, compresses, saves, refreshes UI
 function attachComprobante(fid, monthKey, facturaNombre, onDone) {
   var inp = document.createElement('input');
-  inp.type = 'file'; inp.accept = 'image/*'; inp.capture = 'environment';
+  inp.type = 'file'; inp.accept = 'image/*';
   inp.className = 'file-inp-hidden';
   document.body.appendChild(inp);
   inp.addEventListener('change', function(){
