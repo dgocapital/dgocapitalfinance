@@ -73,6 +73,10 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
 .hstat-val{font-size:14px;font-weight:500;}
 /* Blurred balance */
 .balance-hidden .hero-amount,.balance-hidden .hstat-val,.balance-hidden .sec-tot,.balance-hidden .stot-val{filter:blur(6px);user-select:none;}
+/* Dashboard balance hidden: acumulado, distribución, resumen mensual */
+.balance-hidden .period-main-val,.balance-hidden .pgstat-val,.balance-hidden .pgstat-sub,
+.balance-hidden .bar-val,.balance-hidden #months-tbody td:not(:first-child),
+.balance-hidden .badge{filter:blur(6px);user-select:none;}
 .section{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;}
 .sec-hd{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;cursor:pointer;}
 .sec-hd:active{background:var(--bg4);}
@@ -718,20 +722,15 @@ function toggleHideBalance() {
   var btn = document.getElementById('btn-hide-balance');
   var registroView = document.getElementById('view-registro');
   var dashContent = document.getElementById('dash-content');
-  var periodCard = document.querySelector('.period-card');
   if (balanceHidden) {
     btn.classList.add('hidden-on');
     btn.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
-    // Blur amounts in registro
     registroView.classList.add('balance-hidden');
-    if (periodCard) periodCard.classList.add('balance-hidden');
-    // Also blur dashboard amounts
     if (dashContent) dashContent.classList.add('balance-hidden');
   } else {
     btn.classList.remove('hidden-on');
     btn.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
     registroView.classList.remove('balance-hidden');
-    if (periodCard) periodCard.classList.remove('balance-hidden');
     if (dashContent) dashContent.classList.remove('balance-hidden');
   }
 }
@@ -1411,17 +1410,11 @@ function renderHeatmap() {
     var mixed = hasMixed(data);
     var dotHtml = mixed ? '<div style="width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.7);position:absolute;bottom:2px;right:2px;"></div>' : '';
 
-    // Factura flag
+    // Factura flag: solo mostrar banderita morada si hay pendientes; desaparece cuando todas están pagadas
     var flagHtml = '';
     var ff = facturaFlagMap[dateStr];
-    if (ff) {
-      if (ff.pending) {
-        // Orange flag for pending
-        flagHtml = '<div class="hm-cell-flag" style="background:#f0a832;"></div>';
-      } else if (ff.done && !ff.pending) {
-        // Green flag when all done
-        flagHtml = '<div class="hm-cell-flag" style="background:var(--green);"></div>';
-      }
+    if (ff && ff.pending) {
+      flagHtml = '<div class="hm-cell-flag" style="background:#7c6ef0;"></div>';
     }
 
     cells.push('<div data-date="'+dateStr+'" data-day="'+day+'" '
@@ -1508,8 +1501,7 @@ function renderHeatmap() {
     +'<div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:2px;background:#5ab4f0;"></div><span>Inversión</span></div>'
     +'<div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:2px;background:#f0a832;"></div><span>Gastos</span></div>'
     +'<div style="display:flex;align-items:center;gap:5px;"><div style="width:10px;height:10px;border-radius:2px;background:#f05a30;"></div><span>Deudas</span></div>'
-    +'<div style="display:flex;align-items:center;gap:5px;"><div class="hm-cell-flag" style="position:relative;width:8px;height:9px;background:#f0a832;display:inline-block;clip-path:polygon(0 0,100% 0,100% 65%,50% 100%,0 65%);"></div><span>Factura pendiente</span></div>'
-    +'<div style="display:flex;align-items:center;gap:5px;"><div class="hm-cell-flag" style="position:relative;width:8px;height:9px;background:var(--green);display:inline-block;clip-path:polygon(0 0,100% 0,100% 65%,50% 100%,0 65%);"></div><span>Factura pagada</span></div>';
+    +'<div style="display:flex;align-items:center;gap:5px;"><div style="width:8px;height:9px;background:#7c6ef0;display:inline-block;clip-path:polygon(0 0,100% 0,100% 65%,50% 100%,0 65%);"></div><span>Factura pendiente</span></div>';
 
   var nextBtn = document.getElementById('hm-next');
   if (nextBtn) {
