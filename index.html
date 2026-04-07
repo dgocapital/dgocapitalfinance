@@ -1596,6 +1596,10 @@ function renderHeatmap() {
 
   var totals = Object.values(dayMap).map(function(x){return x.total;});
   var maxVal = totals.length ? Math.max.apply(null, totals) : 1;
+  var maxGano = Math.max.apply(null, Object.values(dayMap).map(function(x){return x.ingreso||0;}).concat([1]));
+  var maxGasto = Math.max.apply(null, Object.values(dayMap).map(function(x){return x.gasto||0;}).concat([1]));
+  var maxDeuda = Math.max.apply(null, Object.values(dayMap).map(function(x){return x.deuda||0;}).concat([1]));
+  var maxInv   = Math.max.apply(null, Object.values(dayMap).map(function(x){return x.inversion||0;}).concat([1]));
 
   function getDayColor(data, intensity) {
     if (!data || data.total === 0) return '#16162a';
@@ -1655,7 +1659,15 @@ function renderHeatmap() {
     var dateStr = hmYear+'-'+String(hmMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
     var data = dayMap[dateStr];
     var val = data ? data.total : 0;
-    var intensity = val > 0 ? Math.max(1, Math.ceil((val/maxVal)*5)) : 0;
+    var intensity = 0;
+    if (val > 0 && data) {
+      var dom = Math.max(data.ingreso||0, data.gasto||0, data.deuda||0, data.inversion||0);
+      var domMax = dom === (data.ingreso||0) ? maxGano
+                 : dom === (data.inversion||0) ? maxInv
+                 : dom === (data.deuda||0) ? maxDeuda
+                 : maxGasto;
+      intensity = Math.max(1, Math.ceil((dom / domMax) * 5));
+    }
     var bg = intensity > 0 ? getDayColor(data, intensity) : '#16162a';
     var isToday = now.getFullYear()===hmYear && now.getMonth()===hmMonth && now.getDate()===day;
     var border = isToday ? '2px solid #7c6ef0' : '1px solid transparent';
