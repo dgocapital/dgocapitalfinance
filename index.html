@@ -454,6 +454,10 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
               <input class="inp-d" id="bi-deb-reg" type="number" placeholder="0" style="width:100%;font-size:14px;padding:10px 12px;"/>
             </div>
           </div>
+          <div style="margin-top:10px;">
+            <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Notas (detalle de inversiones y deudas)</div>
+            <textarea id="bi-notes-reg" rows="3" placeholder="Ej: Inversión en CDT Bancolombia $5M, deuda con banco $2M cuota mensual..." style="width:100%;font-size:12px;padding:9px 11px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);resize:none;line-height:1.5;"></textarea>
+          </div>
           <button id="btn-bi-save-reg" style="margin-top:14px;width:100%;padding:12px;border-radius:var(--r);border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer;">Guardar balance de partida</button>
         </div>
       </div>
@@ -642,6 +646,10 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
             <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Lo que debía (deudas previas)</div>
             <input class="modal-inp" id="bi-deb-set" type="number" placeholder="0" style="margin-bottom:0;"/>
           </div>
+        </div>
+        <div style="margin-top:10px;">
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Notas (detalle de inversiones y deudas)</div>
+          <textarea id="bi-notes-set" rows="3" placeholder="Ej: Inversión en CDT Bancolombia $5M, deuda con banco $2M cuota mensual..." style="width:100%;font-size:12px;padding:9px 11px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);resize:none;line-height:1.5;"></textarea>
         </div>
         <div style="display:flex;gap:8px;margin-top:14px;align-items:center;">
           <button id="btn-bi-save-set" style="flex:1;padding:11px;border-radius:var(--r);border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer;">Guardar</button>
@@ -2255,9 +2263,9 @@ function balanceInicialConfigurado() {
   return DB._cfg && DB._cfg.balanceInicial && DB._cfg.balanceInicial.configurado === true;
 }
 
-function saveBalanceInicial(inv, deb) {
+function saveBalanceInicial(inv, deb, notes) {
   if (!DB._cfg) DB._cfg = {};
-  DB._cfg.balanceInicial = { inv: Number(inv)||0, deb: Number(deb)||0, configurado: true };
+  DB._cfg.balanceInicial = { inv: Number(inv)||0, deb: Number(deb)||0, notes: notes||'', configurado: true };
   saveDB();
 }
 
@@ -2271,8 +2279,10 @@ function renderBalanceInicialRegistro() {
     var bi = getBalanceInicial();
     var invEl = document.getElementById('bi-inv-reg');
     var debEl = document.getElementById('bi-deb-reg');
+    var notEl = document.getElementById('bi-notes-reg');
     if (invEl) invEl.value = bi.inv || '';
     if (debEl) debEl.value = bi.deb || '';
+    if (notEl) notEl.value = bi.notes || '';
   }
 }
 
@@ -2280,8 +2290,10 @@ function renderBalanceInicialSettings() {
   var bi = getBalanceInicial();
   var invEl = document.getElementById('bi-inv-set');
   var debEl = document.getElementById('bi-deb-set');
+  var notEl = document.getElementById('bi-notes-set');
   if (invEl) invEl.value = bi.inv || '';
   if (debEl) debEl.value = bi.deb || '';
+  if (notEl) notEl.value = bi.notes || '';
 }
 
 // Patch renderDash to include balance inicial in acumulado + chart
@@ -2364,7 +2376,8 @@ document.getElementById('notes-ta').addEventListener('input', function(){ DB[cur
 document.getElementById('btn-bi-save-reg').addEventListener('click', function(){
   var inv = parseFloat(document.getElementById('bi-inv-reg').value) || 0;
   var deb = parseFloat(document.getElementById('bi-deb-reg').value) || 0;
-  saveBalanceInicial(inv, deb);
+  var notes = (document.getElementById('bi-notes-reg').value || '').trim();
+  saveBalanceInicial(inv, deb, notes);
   renderBalanceInicialRegistro();
   renderBalanceInicialSettings();
 });
@@ -2373,7 +2386,8 @@ document.getElementById('btn-bi-save-reg').addEventListener('click', function(){
 document.getElementById('btn-bi-save-set').addEventListener('click', function(){
   var inv = parseFloat(document.getElementById('bi-inv-set').value) || 0;
   var deb = parseFloat(document.getElementById('bi-deb-set').value) || 0;
-  saveBalanceInicial(inv, deb);
+  var notes = (document.getElementById('bi-notes-set').value || '').trim();
+  saveBalanceInicial(inv, deb, notes);
   renderBalanceInicialSettings();
   var msg = document.getElementById('bi-saved-msg');
   if (msg) { msg.style.display='inline'; setTimeout(function(){ msg.style.display='none'; }, 2000); }
