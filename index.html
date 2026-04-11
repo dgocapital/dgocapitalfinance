@@ -439,6 +439,26 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
       </div>
     </div>
 
+    <div id="balance-inicial-card" style="display:none;">
+      <div class="section" style="border-color:var(--accent-dim);">
+        <div style="padding:14px 15px;background:var(--bg3);">
+          <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:600;margin-bottom:4px;color:var(--accent2);">⚡ Balance de partida</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:14px;line-height:1.5;">Registra tu situación financiera antes de empezar a usar la app. Solo se configura una vez.</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div>
+              <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Lo que tengo ahorrado / invertido</div>
+              <input class="inp-d" id="bi-inv-reg" type="number" placeholder="0" style="width:100%;font-size:14px;padding:10px 12px;"/>
+            </div>
+            <div>
+              <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Lo que debo (deudas previas)</div>
+              <input class="inp-d" id="bi-deb-reg" type="number" placeholder="0" style="width:100%;font-size:14px;padding:10px 12px;"/>
+            </div>
+          </div>
+          <button id="btn-bi-save-reg" style="margin-top:14px;width:100%;padding:12px;border-radius:var(--r);border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer;">Guardar balance de partida</button>
+        </div>
+      </div>
+    </div>
+
     <div class="notes-card">
       <div class="notes-hd">Notas del mes</div>
       <textarea class="notes-ta" id="notes-ta" placeholder="Observaciones, metas, recordatorios..."></textarea>
@@ -609,6 +629,27 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
       <div class="set-row"><div><div class="set-label">Importar datos</div><div class="set-sub">Restaura un respaldo exportado</div></div><button class="set-btn" id="btn-import" style="color:var(--green);">Importar</button></div>
       <div class="set-row"><div><div class="set-label">Version</div><div class="set-sub">DGO Capital Finance v1.4</div></div></div>
     </div>
+    <div class="sect-lbl">Balance de partida</div>
+    <div class="set-card" id="balance-inicial-settings-card">
+      <div style="padding:14px 15px;">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:14px;line-height:1.5;">Punto de partida antes de usar la app. Se suma al acumulado total en el Dashboard.</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div>
+            <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Lo que tenía ahorrado / invertido</div>
+            <input class="modal-inp" id="bi-inv-set" type="number" placeholder="0" style="margin-bottom:0;"/>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">Lo que debía (deudas previas)</div>
+            <input class="modal-inp" id="bi-deb-set" type="number" placeholder="0" style="margin-bottom:0;"/>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:14px;align-items:center;">
+          <button id="btn-bi-save-set" style="flex:1;padding:11px;border-radius:var(--r);border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer;">Guardar</button>
+          <span id="bi-saved-msg" style="font-size:11px;color:var(--green);display:none;">✓ Guardado</span>
+        </div>
+      </div>
+    </div>
+
     <div class="sect-lbl">Donde se guardan tus datos</div>
     <div class="storage-card">
       <div class="storage-item"><div class="storage-dot" style="background:var(--green);"></div><div class="storage-txt"><b>En tu propio dispositivo.</b> Todo se guarda en localStorage, privado y local en tu celular.</div></div>
@@ -1021,6 +1062,7 @@ function renderSettings() {
   document.getElementById('set-months-count').textContent = n + (n===1?' mes registrado':' meses registrados');
   updateCurrencyUI();
   initNotification();
+  renderBalanceInicialSettings();
 }
 
 function openEditModal(sec, idx) {
@@ -2203,6 +2245,80 @@ function abrirEnClaude() {
   }
 }
 
+// ── BALANCE INICIAL ───────────────────────────────────────────────────────────
+function getBalanceInicial() {
+  var bi = DB._cfg && DB._cfg.balanceInicial;
+  return { inv: (bi && bi.inv) ? Number(bi.inv) : 0, deb: (bi && bi.deb) ? Number(bi.deb) : 0 };
+}
+
+function balanceInicialConfigurado() {
+  return DB._cfg && DB._cfg.balanceInicial && DB._cfg.balanceInicial.configurado === true;
+}
+
+function saveBalanceInicial(inv, deb) {
+  if (!DB._cfg) DB._cfg = {};
+  DB._cfg.balanceInicial = { inv: Number(inv)||0, deb: Number(deb)||0, configurado: true };
+  saveDB();
+}
+
+function renderBalanceInicialRegistro() {
+  var card = document.getElementById('balance-inicial-card');
+  if (!card) return;
+  if (balanceInicialConfigurado()) {
+    card.style.display = 'none';
+  } else {
+    card.style.display = 'block';
+    var bi = getBalanceInicial();
+    var invEl = document.getElementById('bi-inv-reg');
+    var debEl = document.getElementById('bi-deb-reg');
+    if (invEl) invEl.value = bi.inv || '';
+    if (debEl) debEl.value = bi.deb || '';
+  }
+}
+
+function renderBalanceInicialSettings() {
+  var bi = getBalanceInicial();
+  var invEl = document.getElementById('bi-inv-set');
+  var debEl = document.getElementById('bi-deb-set');
+  if (invEl) invEl.value = bi.inv || '';
+  if (debEl) debEl.value = bi.deb || '';
+}
+
+// Patch renderDash to include balance inicial in acumulado + chart
+var _origRenderDash = renderDash;
+renderDash = function() {
+  _origRenderDash();
+  var bi = getBalanceInicial();
+  var biNet = bi.inv - bi.deb;
+  if (biNet === 0) return;
+  // Patch acumulado total
+  var el = document.getElementById('d-bg-total');
+  if (el) {
+    var current = parseFloat(el.textContent.replace(/[^0-9\-\.]/g,'').replace(/\./g,'').replace(',','.')) || 0;
+    // Re-calculate from DB to be safe
+    var keys = mkeys();
+    var tG=0,tD=0,tI=0,tC=0;
+    keys.forEach(function(k){ var d=DB[k]; tG+=sum(d.gano); tD+=sum(d.debo); tI+=sum(d.invierto); tC+=sum(d.consumo); });
+    var totalBG = tG - tD + tI - tC + biNet;
+    el.textContent = fmtF(totalBG);
+    el.className = 'period-main-val' + (totalBG>0?' pos':totalBG<0?' neg':'');
+  }
+};
+
+// Patch renderGrowthChart to offset starting point
+var _origRenderGrowthChart = renderGrowthChart;
+renderGrowthChart = function() {
+  _origRenderGrowthChart();
+  var bi = getBalanceInicial();
+  var biNet = bi.inv - bi.deb;
+  if (biNet === 0 || !growthChartInstance) return;
+  var data = growthChartInstance.data.datasets[0].data;
+  var trend = growthChartInstance.data.datasets[1].data;
+  growthChartInstance.data.datasets[0].data = data.map(function(v){ return v + biNet; });
+  growthChartInstance.data.datasets[1].data = trend.map(function(v){ return v + biNet; });
+  growthChartInstance.update('none');
+};
+
 // ── EVENT LISTENERS ──────────────────────────────────────────────────────────
 document.getElementById('btn-add-month').addEventListener('click', showAddMonth);
 document.getElementById('btn-hide-balance').addEventListener('click', toggleHideBalance);
@@ -2244,6 +2360,25 @@ document.getElementById('notes-ta').addEventListener('input', function(){ DB[cur
   document.getElementById('v-'+sec).addEventListener('keydown', function(e){if(e.key==='Enter')addItem(sec);});
 });
 
+// Balance inicial — botón en Registro
+document.getElementById('btn-bi-save-reg').addEventListener('click', function(){
+  var inv = parseFloat(document.getElementById('bi-inv-reg').value) || 0;
+  var deb = parseFloat(document.getElementById('bi-deb-reg').value) || 0;
+  saveBalanceInicial(inv, deb);
+  renderBalanceInicialRegistro();
+  renderBalanceInicialSettings();
+});
+
+// Balance inicial — botón en Ajustes
+document.getElementById('btn-bi-save-set').addEventListener('click', function(){
+  var inv = parseFloat(document.getElementById('bi-inv-set').value) || 0;
+  var deb = parseFloat(document.getElementById('bi-deb-set').value) || 0;
+  saveBalanceInicial(inv, deb);
+  renderBalanceInicialSettings();
+  var msg = document.getElementById('bi-saved-msg');
+  if (msg) { msg.style.display='inline'; setTimeout(function(){ msg.style.display='none'; }, 2000); }
+});
+
 // ── INIT ─────────────────────────────────────────────────────────────────────
 loadDB();
 loadFacturas();
@@ -2252,7 +2387,7 @@ var budPctEl = document.getElementById('bud-pct');
 if(budPctEl && DB._cfg && DB._cfg.savePct) {
   budPctEl.value = DB._cfg.savePct;
 }
-updateCurrencyUI(); renderPills(); renderCurrent();
+updateCurrencyUI(); renderPills(); renderCurrent(); renderBalanceInicialRegistro();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </body>
