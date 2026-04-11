@@ -2256,7 +2256,7 @@ function abrirEnClaude() {
 // ── BALANCE INICIAL ───────────────────────────────────────────────────────────
 function getBalanceInicial() {
   var bi = DB._cfg && DB._cfg.balanceInicial;
-  return { inv: (bi && bi.inv) ? Number(bi.inv) : 0, deb: (bi && bi.deb) ? Number(bi.deb) : 0 };
+  return { inv: (bi && bi.inv) ? Number(bi.inv) : 0, deb: (bi && bi.deb) ? Number(bi.deb) : 0, notes: (bi && bi.notes) ? bi.notes : '' };
 }
 
 function balanceInicialConfigurado() {
