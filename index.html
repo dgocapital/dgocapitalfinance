@@ -273,6 +273,18 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
 .factura-date{font-size:10px;color:var(--text3);margin-top:2px;}
 .factura-del{font-size:16px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0 4px;}
 .factura-del:active{color:var(--red);}
+/* ── TOOLTIPS INFO ────────────────────────────────────────────────────────── */
+.info-wrap{position:relative;display:inline-flex;align-items:center;margin-left:5px;vertical-align:middle;}
+.info-btn{width:18px;height:18px;border-radius:50%;background:var(--bg4);border:1.5px solid var(--border);color:var(--text3);font-size:10px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1;padding:0;font-style:italic;}
+.info-btn:hover,.info-btn:focus{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);outline:none;}
+.info-tip{display:none;position:fixed;background:var(--bg4);border:1px solid var(--border);border-radius:var(--r-sm);padding:11px 13px;font-size:12px;color:var(--text2);line-height:1.6;width:240px;max-width:calc(100vw - 32px);z-index:9999;pointer-events:none;box-shadow:0 6px 24px rgba(0,0,0,0.55);}
+.info-wrap.open .info-tip{display:block;}
+/* ── FRECUENCIA FACTURAS ──────────────────────────────────────────────────── */
+.freq-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0 10px;}
+.freq-opt{padding:8px 4px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:10px;font-weight:500;text-align:center;cursor:pointer;transition:all .15s;line-height:1.3;}
+.freq-opt:hover{border-color:var(--accent);color:var(--accent);}
+.freq-opt.sel{border-color:var(--accent);background:var(--accent-dim);color:var(--accent);font-weight:700;}
+.factura-freq-badge{font-size:9px;color:var(--accent2);background:var(--accent-dim);border-radius:4px;padding:1px 5px;margin-left:4px;display:inline-block;vertical-align:middle;font-weight:600;}
 
 /* Flag en heatmap cell */
 .hm-cell-flag{position:absolute;top:1px;right:1px;width:5px;height:6px;clip-path:polygon(0 0,100% 0,100% 65%,50% 100%,0 65%);}
@@ -344,6 +356,7 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
           <div><div class="sec-name">Lo que gano</div><div class="sec-sub" style="color:var(--green)">Ingresos del mes</div></div>
         </div>
         <div class="sec-right">
+          <span class="info-wrap" id="tip-wrap-gano"><button class="info-btn" onclick="toggleTip('tip-wrap-gano',event)" title="Ayuda">i</button><span class="info-tip">💰 <b>Ingresos del mes</b><br>Registra todo lo que ingresa a tu bolsillo: salario, freelance, ventas, arriendos cobrados, etc. Usa la descripción para identificar la fuente.</span></span>
           <span class="sec-tot" style="color:var(--green)" id="stot-gano">$ 0</span>
           <span class="chev open" id="chev-gano">&#9660;</span>
         </div>
@@ -368,6 +381,7 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
           <div><div class="sec-name">Lo que debo</div><div class="sec-sub" style="color:var(--red)">Deudas y obligaciones</div></div>
         </div>
         <div class="sec-right">
+          <span class="info-wrap" id="tip-wrap-debo"><button class="info-btn" onclick="toggleTip('tip-wrap-debo',event)" title="Ayuda">i</button><span class="info-tip">📋 <b>Deudas y obligaciones</b><br>Incluye cuotas de crédito, préstamos personales, deudas con familiares o cualquier pago que debas cubrir este mes.</span></span>
           <span class="sec-tot" style="color:var(--red)" id="stot-debo">$ 0</span>
           <span class="chev open" id="chev-debo">&#9660;</span>
         </div>
@@ -392,6 +406,7 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
           <div><div class="sec-name">Lo que invierto</div><div class="sec-sub" style="color:var(--blue)">Ahorro e inversiones</div></div>
         </div>
         <div class="sec-right">
+          <span class="info-wrap" id="tip-wrap-invierto"><button class="info-btn" onclick="toggleTip('tip-wrap-invierto',event)" title="Ayuda">i</button><span class="info-tip">📈 <b>Ahorro e inversiones</b><br>Registra lo que separas para ahorro, CDT, fondos, acciones, criptos, fondo de emergencia, etc. ¡Primero págarte a ti mismo!</span></span>
           <span class="sec-tot" style="color:var(--blue)" id="stot-invierto">$ 0</span>
           <span class="chev open" id="chev-invierto">&#9660;</span>
         </div>
@@ -416,6 +431,7 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
           <div><div class="sec-name">Lo que consumo</div><div class="sec-sub" style="color:var(--amber)">Gastos del mes</div></div>
         </div>
         <div class="sec-right">
+          <span class="info-wrap" id="tip-wrap-consumo"><button class="info-btn" onclick="toggleTip('tip-wrap-consumo',event)" title="Ayuda">i</button><span class="info-tip">🛒 <b>Gastos del mes</b><br>Todo lo que gastas: mercado, transporte, salidas, ropa, suscripciones, etc.<br><b>Fijo:</b> se repite igual cada mes.<br><b>Común:</b> gasto habitual pero variable.</span></span>
           <span class="sec-tot" style="color:var(--amber)" id="stot-consumo">$ 0</span>
           <span class="chev open" id="chev-consumo">&#9660;</span>
         </div>
@@ -769,15 +785,41 @@ function toggleFacturaExecution(facturaId, monthKey) {
   saveFacturas();
 }
 
-// Get facturas for a specific month (all facturas are shown every month)
+// Get facturas for a specific month, filtered by frequency
 // Returns {pending:[], done:[]}
 function getFacturasForMonth(monthKey) {
   var pending = [], done = [];
   FACTURAS.forEach(function(f){
+    if (!facturaApplicableInMonth(f, monthKey)) return;
     if (isFacturaDoneInMonth(f, monthKey)) done.push(f);
     else pending.push(f);
   });
   return {pending:pending, done:done};
+}
+
+// Check if a factura applies in a given monthKey based on its frequency
+function facturaApplicableInMonth(f, monthKey) {
+  var freq = f.frecuencia || 'mensual';
+  if (freq === 'mensual') return true;
+  // Parse monthKey -> index (months since epoch)
+  var parts = monthKey.split(' ');
+  var mesIdx = MES.indexOf(parts[0]);
+  var anio = parseInt(parts[1]);
+  if (mesIdx < 0 || isNaN(anio)) return true;
+  var targetAbs = anio * 12 + mesIdx;
+  // Parse mesInicio
+  var startAbs = targetAbs; // fallback: always show
+  if (f.mesInicio) {
+    var sp = f.mesInicio.split(' ');
+    var smi = MES.indexOf(sp[0]);
+    var sa = parseInt(sp[1]);
+    if (smi >= 0 && !isNaN(sa)) startAbs = sa * 12 + smi;
+  }
+  if (targetAbs < startAbs) return false;
+  var diff = targetAbs - startAbs;
+  var interval = {mensual:1,bimestral:2,trimestral:3,semestral:6,anual:12}[freq];
+  if (freq === 'personalizado') interval = f.frecuenciaCustom || 1;
+  return (diff % interval === 0);
 }
 
 // ── HIDE BALANCE ─────────────────────────────────────────────────────────────
@@ -1302,10 +1344,12 @@ function buildFacturasModalHTML(monthKey) {
         var parts = dateStr.split('-');
         diaLabel = 'Día ' + parseInt(parts[2]) + ' · ' + monthKey;
       }
+      var freqLabels = {mensual:'Mensual',bimestral:'Cada 2 meses',trimestral:'Trimestral',semestral:'Semestral',anual:'Anual'};
+      var freqStr = f.frecuencia && f.frecuencia !== 'mensual' ? (freqLabels[f.frecuencia] || ('Cada ' + (f.frecuenciaCustom||'?') + ' meses')) : '';
       itemsHTML += '<div class="factura-item" data-fid="' + f.id + '">'
         + '<button class="factura-check ' + (done?'done':'') + '" data-fid="' + f.id + '" data-month="' + monthKey + '">' + (done?'✓':'') + '</button>'
         + '<div class="factura-info">'
-        + '<div class="factura-name ' + (done?'done':'') + '">' + escapeHtml(f.name) + '</div>'
+        + '<div class="factura-name ' + (done?'done':'') + '">' + escapeHtml(f.name) + (freqStr ? '<span class="factura-freq-badge">' + freqStr + '</span>' : '') + '</div>'
         + '<div class="factura-date">' + diaLabel + '</div>'
         + (done ? '<div class="comp-area" data-fid="'+f.id+'" data-month="'+monthKey+'" data-name="'+escapeHtml(f.name)+'"><button class="comp-btn" data-action="attach" data-fid="'+f.id+'" data-month="'+monthKey+'" data-name="'+escapeHtml(f.name)+'">📎 Adjuntar comprobante</button></div>' : '')
         + '</div>'
@@ -1315,20 +1359,85 @@ function buildFacturasModalHTML(monthKey) {
   }
 
   return '<div class="modal-box scroll"><h3>&#127987; Gestión de Facturas</h3>'
-    + '<div style="font-size:11px;color:var(--text3);margin-bottom:14px;line-height:1.5;">Las facturas se repiten automáticamente cada mes. Márcalas como pagadas y adjunta el comprobante.</div>'
+    + '<div style="font-size:11px;color:var(--text3);margin-bottom:14px;line-height:1.5;">Administra tus pagos recurrentes. Configura la frecuencia de cada factura y márcalas como pagadas.</div>'
     + '<div id="facturas-list">' + itemsHTML + '</div>'
     + '<div style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">'
-    + '<div style="font-size:11px;color:var(--text2);font-weight:600;margin-bottom:8px;">Agregar nueva factura</div>'
-    + '<div style="display:flex;gap:6px;align-items:center;">'
-    + '<input class="modal-inp" id="new-factura-name" placeholder="Nombre (Ej: Arrendo)" style="flex:2;margin-bottom:0;"/>'
-    + '<input class="modal-inp" id="new-factura-dia" type="number" min="1" max="31" placeholder="Día" style="flex:1;margin-bottom:0;width:60px;"/>'
-    + '<button id="btn-add-factura" style="padding:11px 14px;border-radius:var(--r);border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;flex-shrink:0;">+ Agregar</button>'
+    + '<div style="font-size:11px;color:var(--text2);font-weight:600;margin-bottom:10px;">➕ Agregar nueva factura</div>'
+    + '<input class="modal-inp" id="new-factura-name" placeholder="Nombre (Ej: Arriendo, Netflix, Gym...)"/>'
+    + '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">'
+    + '<input class="modal-inp" id="new-factura-dia" type="number" min="1" max="31" placeholder="Día de vencimiento (1-31)" style="margin-bottom:0;flex:1;"/>'
     + '</div>'
-    + '<div style="font-size:10px;color:var(--text3);margin-top:6px;">El número es el día del mes en que vence la factura</div>'
+    + '<div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Frecuencia de repetición</div>'
+    + '<div class="freq-grid" id="freq-grid">'
+    + '<button class="freq-opt sel" data-freq="mensual">📅<br>Mensual</button>'
+    + '<button class="freq-opt" data-freq="bimestral">📅<br>Bimestral</button>'
+    + '<button class="freq-opt" data-freq="trimestral">📅<br>Trimestral</button>'
+    + '<button class="freq-opt" data-freq="semestral">📅<br>Semestral</button>'
+    + '<button class="freq-opt" data-freq="anual">📅<br>Anual</button>'
+    + '<button class="freq-opt" data-freq="personalizado">⚙️<br>Custom</button>'
+    + '</div>'
+    + '<div id="freq-custom-row" style="display:none;margin-bottom:10px;">'
+    + '<div style="font-size:10px;color:var(--text3);margin-bottom:5px;">Cada cuántos meses se repite:</div>'
+    + '<input class="modal-inp" id="freq-custom-val" type="number" min="1" max="24" placeholder="Ej: 4 (cada 4 meses)" style="margin-bottom:0;"/>'
+    + '</div>'
+    + '<div style="font-size:10px;color:var(--text3);margin-bottom:12px;line-height:1.5;">ℹ️ La factura aparecerá solo en los meses que corresponda según la frecuencia elegida, a partir del mes en que la agregues.</div>'
+    + '<button id="btn-add-factura" style="width:100%;padding:12px;border-radius:var(--r);border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer;">+ Agregar factura</button>'
     + '</div>'
     + '<div style="margin-top:16px;"><button class="mbtn-c" id="facturas-close" style="width:100%;">Cerrar</button></div>'
     + '</div>';
 }
+
+// ── TOOLTIPS ──────────────────────────────────────────────────────────────────
+function toggleTip(wrapId, e) {
+  e && e.stopPropagation();
+  var wrap = document.getElementById(wrapId);
+  if (!wrap) return;
+  var isOpen = wrap.classList.contains('open');
+  // Close all others first
+  document.querySelectorAll('.info-wrap.open').forEach(function(w){ w.classList.remove('open'); });
+  if (isOpen) return;
+  wrap.classList.add('open');
+  // Position the tip using fixed coords
+  var tip = wrap.querySelector('.info-tip');
+  if (!tip) return;
+  tip.style.left = '';
+  tip.style.top = '';
+  tip.style.right = '';
+  // Get button position
+  var btn = wrap.querySelector('.info-btn');
+  var rect = btn.getBoundingClientRect();
+  var tipW = 240;
+  var margin = 12;
+  // Calculate ideal left: centered on button, but clamped to viewport
+  var idealLeft = rect.left + rect.width / 2 - tipW / 2;
+  var clampedLeft = Math.max(margin, Math.min(idealLeft, window.innerWidth - tipW - margin));
+  var top = rect.top - 8; // will go upward via transform
+  // Adjust arrow: its position relative to tip box
+  var arrowLeft = (rect.left + rect.width / 2) - clampedLeft;
+  arrowLeft = Math.max(12, Math.min(arrowLeft, tipW - 12));
+  tip.style.left = clampedLeft + 'px';
+  tip.style.top = top + 'px';
+  tip.style.transform = 'translateY(-100%)';
+  // Update arrow position
+  tip.style.setProperty('--arrow-left', arrowLeft + 'px');
+  // Inline arrow style override
+  var after = tip.querySelector('.__arrow');
+  if (!after) {
+    var arrowEl = document.createElement('span');
+    arrowEl.className = '__arrow';
+    arrowEl.style.cssText = 'position:absolute;top:100%;border:6px solid transparent;border-top-color:var(--bg4);left:' + arrowLeft + 'px;transform:translateX(-50%);';
+    tip.appendChild(arrowEl);
+    // Remove CSS ::after since we use inline span
+    tip.style.setProperty('--no-after','1');
+  } else {
+    after.style.left = arrowLeft + 'px';
+  }
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest || !e.target.closest('.info-wrap')) {
+    document.querySelectorAll('.info-wrap.open').forEach(function(w){ w.classList.remove('open'); });
+  }
+});
 
 function escapeHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -1348,13 +1457,38 @@ function wireFacturasModal(div, monthKey) {
     var diaEl = document.getElementById('new-factura-dia');
     var name = nameEl ? nameEl.value.trim() : '';
     var dia = parseInt(diaEl ? diaEl.value : 0);
-    if (!name || !dia || dia < 1 || dia > 31) return;
-    var newF = {id: 'f_' + Date.now(), name: name, dia: dia, executedMonths: []};
+    if (!name) { if(nameEl){nameEl.style.borderColor='var(--red)';setTimeout(function(){nameEl.style.borderColor='';},1200);} return; }
+    if (!dia || dia < 1 || dia > 31) { if(diaEl){diaEl.style.borderColor='var(--red)';setTimeout(function(){diaEl.style.borderColor='';},1200);} return; }
+    var selFreq = div.querySelector('.freq-opt.sel');
+    var frecuencia = selFreq ? selFreq.dataset.freq : 'mensual';
+    var frecuenciaCustom = null;
+    if (frecuencia === 'personalizado') {
+      var cvEl = document.getElementById('freq-custom-val');
+      var customVal = parseInt(cvEl ? cvEl.value : 0);
+      if (!customVal || customVal < 1) { if(cvEl){cvEl.style.borderColor='var(--red)';setTimeout(function(){cvEl.style.borderColor='';},1200);} return; }
+      frecuenciaCustom = customVal;
+    }
+    var now2 = new Date();
+    var mesInicio = MES[now2.getMonth()] + ' ' + now2.getFullYear();
+    var newF = {id: 'f_' + Date.now(), name: name, dia: dia, frecuencia: frecuencia, frecuenciaCustom: frecuenciaCustom, mesInicio: mesInicio, executedMonths: []};
     FACTURAS.push(newF);
     saveFacturas();
     nameEl.value = ''; diaEl.value = '';
+    div.querySelectorAll('.freq-opt').forEach(function(b){ b.classList.toggle('sel', b.dataset.freq==='mensual'); });
+    var fcr = document.getElementById('freq-custom-row'); if(fcr) fcr.style.display='none';
+    var fcv = document.getElementById('freq-custom-val'); if(fcv) fcv.value='';
     refreshFacturasListInModal(monthKey);
     updateFacturasBtnSub();
+  });
+
+  // Freq grid selector
+  div.querySelectorAll('.freq-opt').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      div.querySelectorAll('.freq-opt').forEach(function(b){ b.classList.remove('sel'); });
+      this.classList.add('sel');
+      var customRow = document.getElementById('freq-custom-row');
+      if (customRow) customRow.style.display = (this.dataset.freq==='personalizado') ? 'block' : 'none';
+    });
   });
 
   div.querySelector('#new-factura-name') && div.querySelector('#new-factura-name').addEventListener('keydown', function(e){
@@ -1489,10 +1623,12 @@ function refreshFacturasListInModal(monthKey) {
     var diaLabel = 'Día ' + f.dia + ' de cada mes';
     var dateStr = facturaDateStr(f, monthKey);
     if (dateStr) { var p=dateStr.split('-'); diaLabel='Día '+parseInt(p[2])+' · '+monthKey; }
+    var freqLabels = {mensual:'Mensual',bimestral:'Cada 2 meses',trimestral:'Trimestral',semestral:'Semestral',anual:'Anual'};
+    var freqStr = f.frecuencia && f.frecuencia !== 'mensual' ? (freqLabels[f.frecuencia] || ('Cada ' + (f.frecuenciaCustom||'?') + ' meses')) : '';
     html += '<div class="factura-item" data-fid="' + f.id + '">'
       + '<button class="factura-check ' + (done?'done':'') + '" data-fid="' + f.id + '" data-month="' + monthKey + '">' + (done?'✓':'') + '</button>'
       + '<div class="factura-info">'
-      + '<div class="factura-name ' + (done?'done':'') + '">' + escapeHtml(f.name) + '</div>'
+      + '<div class="factura-name ' + (done?'done':'') + '">' + escapeHtml(f.name) + (freqStr ? '<span class="factura-freq-badge">' + freqStr + '</span>' : '') + '</div>'
       + '<div class="factura-date">' + diaLabel + '</div>'
       + (done ? '<div class="comp-area" data-fid="'+f.id+'" data-month="'+monthKey+'" data-name="'+escapeHtml(f.name)+'"><button class="comp-btn" data-action="attach" data-fid="'+f.id+'" data-month="'+monthKey+'" data-name="'+escapeHtml(f.name)+'">📎 Adjuntar comprobante</button></div>' : '')
       + '</div>'
