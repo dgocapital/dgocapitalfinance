@@ -956,7 +956,7 @@ function updateCurrencyUI() {
 function renderCurrent() {
   var d = DB[cur] || emptyMonth();
   var g=sum(d.gano), de=sum(d.debo), inv=sum(d.invierto), con=sum(d.consumo);
-  var bg = g - de + inv - con;
+  var bg = g - de - inv - con;
   var ha = document.getElementById('hero-amount');
   ha.textContent = fmtF(bg);
   ha.className = 'hero-amount' + (bg>0?' pos':bg<0?' neg':'');
@@ -1047,7 +1047,7 @@ function renderDash() {
   document.getElementById('dash-content').style.display='flex';
   var tG=0,tD=0,tI=0,tC=0;
   keys.forEach(function(k){ var d=DB[k]; tG+=sum(d.gano); tD+=sum(d.debo); tI+=sum(d.invierto); tC+=sum(d.consumo); });
-  var totalBG = tG-tD+tI-tC;
+  var totalBG = tG-tD-tI-tC;
   var el = document.getElementById('d-bg-total');
   el.textContent = fmtF(totalBG);
   el.className = 'period-main-val' + (totalBG>0?' pos':totalBG<0?' neg':'');
@@ -1063,7 +1063,7 @@ function renderDash() {
   }).join('');
   document.getElementById('months-tbody').innerHTML = keys.slice().reverse().map(function(k){
     var d=DB[k], g=sum(d.gano), inv=sum(d.invierto), de=sum(d.debo), con=sum(d.consumo);
-    var bg=g-de+inv-con;
+    var bg=g-de-inv-con;
     return '<tr><td>'+k.split(' ')[0].substring(0,3)+' '+k.split(' ')[1]+'</td><td style="color:var(--green)">'+fmt(g)+'</td><td style="color:var(--blue)">'+fmt(inv)+'</td><td style="color:var(--red)">'+fmt(de)+'</td><td style="color:var(--amber)">'+fmt(con)+'</td><td><span class="badge '+(bg>=0?'badge-pos':'badge-neg')+'">'+fmt(bg)+'</span></td></tr>';
   }).join('');
   setTimeout(renderGrowthChart, 100);
@@ -2314,7 +2314,7 @@ function buildAnalysisPrompt(scope) {
   targetKeys.forEach(function(k) {
     var d = DB[k];
     var g = sum(d.gano), de = sum(d.debo), inv = sum(d.invierto), con = sum(d.consumo);
-    var bg = g - de + inv - con;
+    var bg = g - de - inv - con;
     lines.push('=== ' + k + ' ===');
     lines.push('Ingresos: ' + sym + Math.round(g).toLocaleString('es-CO'));
     if (d.gano.length) d.gano.forEach(function(it){ lines.push('  - ' + it.desc + ': ' + sym + Math.round(it.val).toLocaleString('es-CO')); });
@@ -2429,7 +2429,7 @@ renderDash = function() {
     var keys = mkeys();
     var tG=0,tD=0,tI=0,tC=0;
     keys.forEach(function(k){ var d=DB[k]; tG+=sum(d.gano); tD+=sum(d.debo); tI+=sum(d.invierto); tC+=sum(d.consumo); });
-    var totalBG = tG - tD + tI - tC + biNet;
+    var totalBG = tG - tD - tI - tC + biNet;
     el.textContent = fmtF(totalBG);
     el.className = 'period-main-val' + (totalBG>0?' pos':totalBG<0?' neg':'');
   }
