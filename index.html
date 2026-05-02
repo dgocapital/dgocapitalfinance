@@ -2526,98 +2526,269 @@ updateCurrencyUI(); renderPills(); renderCurrent(); renderBalanceInicialRegistro
 function exportToExcel() {
   var keys = mkeys();
   if (!keys.length) { alert('No hay datos para exportar.'); return; }
-  var sym = CC.symbol;
-  if (typeof XLSX === 'undefined') {
+  if (typeof XLSX === 'undefined' || !XLSX.utils || !XLSX.utils.book_new) {
     var s = document.createElement('script');
-    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
-    s.onload = function(){ buildExcel(keys, sym); };
+    s.src = 'https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js';
+    s.onload = function(){ buildExcel(keys); };
     s.onerror = function(){ alert('No se pudo cargar la libreria de Excel. Verifica tu conexion.'); };
     document.head.appendChild(s);
   } else {
-    buildExcel(keys, sym);
+    buildExcel(keys);
   }
 }
 
-function buildExcel(keys, sym) {
-  var wb = XLSX.utils.book_new();
+function buildExcel(keys) {
+  var XS = XLSX;
+  var wb = XS.utils.book_new();
+  var n = keys.length;
+  var sym = CC.symbol;
 
-  // Hoja 1: Resumen general
-  var resumenData = [
-    ['DGO Capital Finance — Resumen General'],
-    [''],
-    ['Mes', 'Ingresos', 'Invierto', 'Deudas', 'Consumo', 'Balance libre'],
-  ];
-  var totG=0, totI=0, totD=0, totC=0;
-  keys.forEach(function(k) {
-    var d = DB[k];
-    var g=sum(d.gano), inv=sum(d.invierto), de=sum(d.debo), con=sum(d.consumo);
-    var bg = g - de - con;
-    totG+=g; totI+=inv; totD+=de; totC+=con;
-    resumenData.push([k, g, inv, de, con, bg]);
-  });
-  resumenData.push(['']);
-  resumenData.push(['TOTAL', totG, totI, totD, totC, totG - totD - totC]);
-  var wsResumen = XLSX.utils.aoa_to_sheet(resumenData);
-  wsResumen['!cols'] = [{wch:18},{wch:16},{wch:16},{wch:16},{wch:16},{wch:16}];
-  XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumen');
+  var numFmt = CC.dec > 0
+    ? '"' + sym + '" #,##0.00'
+    : '"' + sym + '" #,##0';
 
-  // Hojas por mes
-  keys.forEach(function(k) {
-    var d = DB[k];
-    var g=sum(d.gano), inv=sum(d.invierto), de=sum(d.debo), con=sum(d.consumo);
-    var bg = g - de - con;
-    var rows = [
-      ['DGO Capital Finance — ' + k],
-      [''],
-      ['INGRESOS', ''],
-      ['Descripcion', 'Valor'],
-    ];
-    if (d.gano.length) { d.gano.forEach(function(it){ rows.push([it.desc, it.val]); }); }
-    else { rows.push(['(sin ingresos)', '']); }
-    rows.push(['Total ingresos', g]);
-    rows.push(['']);
-    rows.push(['INVIERTO', '']);
-    rows.push(['Descripcion', 'Valor']);
-    if (d.invierto.length) { d.invierto.forEach(function(it){ rows.push([it.desc, it.val]); }); }
-    else { rows.push(['(sin inversiones)', '']); }
-    rows.push(['Total invierto', inv]);
-    rows.push(['']);
-    rows.push(['DEUDAS', '']);
-    rows.push(['Descripcion', 'Valor']);
-    if (d.debo.length) { d.debo.forEach(function(it){ rows.push([it.desc, it.val]); }); }
-    else { rows.push(['(sin deudas)', '']); }
-    rows.push(['Total deudas', de]);
-    rows.push(['']);
-    rows.push(['CONSUMO', '']);
-    rows.push(['Descripcion', 'Valor', 'Tipo']);
-    if (d.consumo.length) { d.consumo.forEach(function(it){ rows.push([it.desc, it.val, it.tipo||'normal']); }); }
-    else { rows.push(['(sin gastos)', '', '']); }
-    rows.push(['Total consumo', con]);
-    rows.push(['']);
-    rows.push(['BALANCE LIBRE DEL MES', bg]);
-    if (d.notes) { rows.push(['']); rows.push(['Notas:', d.notes]); }
-    var sheetName = k.substring(0,3) + ' ' + k.split(' ')[1];
-    if (sheetName.length > 31) sheetName = sheetName.substring(0,31);
-    var ws = XLSX.utils.aoa_to_sheet(rows);
-    ws['!cols'] = [{wch:28},{wch:16},{wch:12}];
-    XLSX.utils.book_append_sheet(wb, ws, sheetName);
-  });
+  // ── Paleta ───────────────────────────────────────────────────────────────
+  var P = {
+    purple:   '6B3FA0', purpleL: 'EDE9F7', purpleM: 'C4B5E8',
+    white:    'FFFFFF', rowAlt:  'FAF9FD',
+    dark:     '1A1535', mid:     '5A5280', light:   '9B93BC',
+    green:    '0A8A5A', greenL:  'D6F5EA',
+    red:      'C0392B', redL:    'FDE8E6',
+    blue:     '1A6AB5', blueL:   'DEE4F8',
+    amber:    'B06000', amberL:  'FEF3E2',
+    border:   'D4CDEF',
+  };
 
-  // Hoja Facturas
-  if (FACTURAS.length) {
-    var fRows = [['FACTURAS / PAGOS RECURRENTES'],[''],['Nombre', 'Dia del mes', 'Frecuencia']];
-    FACTURAS.forEach(function(f){ fRows.push([f.name, f.dia, f.freq||'mensual']); });
-    var wsF = XLSX.utils.aoa_to_sheet(fRows);
-    wsF['!cols'] = [{wch:28},{wch:14},{wch:14}];
-    XLSX.utils.book_append_sheet(wb, wsF, 'Facturas');
+  // ── Helpers de estilo ─────────────────────────────────────────────────────
+  function bdr() {
+    var b = { style:'thin', color:{ rgb: P.border } };
+    return { top:b, bottom:b, left:b, right:b };
   }
 
+  function cs(v, opts) {
+    // opts: bg, fg, bold, sz, italic, align, numFmt, border
+    opts = opts || {};
+    var isNum = typeof v === 'number';
+    var cell = { v: v, t: isNum ? 'n' : 's', s: {} };
+    var s = cell.s;
+    s.font = { name: 'Calibri', sz: opts.sz || 10, bold: !!opts.bold, italic: !!opts.italic, color: { rgb: opts.fg || P.dark } };
+    s.fill = { patternType: 'solid', fgColor: { rgb: opts.bg || P.white } };
+    s.alignment = { horizontal: opts.align || (isNum ? 'right' : 'left'), vertical: 'center', wrapText: !!opts.wrap };
+    if (opts.border !== false) s.border = bdr();
+    if (opts.numFmt) s.numFmt = opts.numFmt;
+    return cell;
+  }
+
+  function emptyCell(bg) {
+    return { v:'', t:'s', s:{ fill:{ patternType:'solid', fgColor:{ rgb: bg || P.white } }, font:{ name:'Calibri', sz:10 }, border: bdr() } };
+  }
+
+  function writeSheet(aoaRows, colWidths, rowHeights, merges) {
+    var ws = XS.utils.aoa_to_sheet(aoaRows.map(function(row){ return row.map(function(c){ return c && c.s ? c : (c === null ? emptyCell(P.white) : c); }); }));
+    // Aplicar estilos celda por celda
+    aoaRows.forEach(function(row, ri) {
+      row.forEach(function(cell, ci) {
+        if (cell && cell.s) {
+          var addr = XS.utils.encode_cell({c:ci, r:ri});
+          if (!ws[addr]) ws[addr] = {};
+          ws[addr].s = cell.s;
+          ws[addr].v = cell.v;
+          ws[addr].t = cell.t || 's';
+          if (cell.s.numFmt) ws[addr].z = cell.s.numFmt;
+        }
+      });
+    });
+    if (colWidths) ws['!cols'] = colWidths.map(function(w){ return {wch:w}; });
+    if (rowHeights) ws['!rows'] = rowHeights.map(function(h){ return h ? {hpt:h} : {}; });
+    if (merges) ws['!merges'] = merges;
+    return ws;
+  }
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // HOJA 1 — RESUMEN GENERAL
+  // ════════════════════════════════════════════════════════════════════════════
+  var totG=0,totI=0,totD=0,totC=0;
+  var dataRows = keys.map(function(k, idx) {
+    var d=DB[k], g=sum(d.gano), inv=sum(d.invierto), de=sum(d.debo), con=sum(d.consumo);
+    var bg=g-de-con;
+    totG+=g; totI+=inv; totD+=de; totC+=con;
+    var rb = idx%2===0 ? P.white : P.rowAlt;
+    return [
+      cs(k,   {bg:rb, fg:P.dark,  bold:true,  align:'left'}),
+      cs(g,   {bg:rb, fg:P.green, numFmt:numFmt}),
+      cs(inv, {bg:rb, fg:P.blue,  numFmt:numFmt}),
+      cs(de,  {bg:rb, fg:P.red,   numFmt:numFmt}),
+      cs(con, {bg:rb, fg:P.amber, numFmt:numFmt}),
+      cs(bg,  {bg: bg>=0?P.greenL:P.redL, fg: bg>=0?P.green:P.red, bold:true, numFmt:numFmt}),
+    ];
+  });
+  var bgTot = totG-totD-totC;
+  var avgG=n?totG/n:0, avgI=n?totI/n:0, avgD=n?totD/n:0, avgC=n?totC/n:0;
+
+  var rows1 = [
+    // Fila 0 — título
+    [ cs('DGO Capital Finance',             {bg:P.purple, fg:P.white, bold:true, sz:15, align:'center', border:false}), emptyCell(P.purple),emptyCell(P.purple),emptyCell(P.purple),emptyCell(P.purple),emptyCell(P.purple) ],
+    // Fila 1 — subtítulo
+    [ cs('Resumen General — Todos los meses',{bg:P.purpleL,fg:P.mid,  italic:true, sz:9, align:'center', border:false}), emptyCell(P.purpleL),emptyCell(P.purpleL),emptyCell(P.purpleL),emptyCell(P.purpleL),emptyCell(P.purpleL) ],
+    // Fila 2 — espacio
+    [ emptyCell(P.white),emptyCell(P.white),emptyCell(P.white),emptyCell(P.white),emptyCell(P.white),emptyCell(P.white) ],
+    // Fila 3 — encabezados
+    [
+      cs('Mes',           {bg:P.purple, fg:P.white, bold:true, sz:11, align:'center'}),
+      cs('Ingresos',      {bg:P.purple, fg:P.white, bold:true, sz:11, align:'center'}),
+      cs('Invierto',      {bg:P.purple, fg:P.white, bold:true, sz:11, align:'center'}),
+      cs('Deudas',        {bg:P.purple, fg:P.white, bold:true, sz:11, align:'center'}),
+      cs('Consumo',       {bg:P.purple, fg:P.white, bold:true, sz:11, align:'center'}),
+      cs('Balance libre', {bg:P.purple, fg:P.white, bold:true, sz:11, align:'center'}),
+    ],
+  ].concat(dataRows).concat([
+    // Fila TOTAL
+    [
+      cs('TOTAL', {bg:P.purpleM, fg:P.dark,  bold:true, sz:11, align:'left'}),
+      cs(totG,    {bg:P.purpleM, fg:P.green,  bold:true, numFmt:numFmt}),
+      cs(totI,    {bg:P.purpleM, fg:P.blue,   bold:true, numFmt:numFmt}),
+      cs(totD,    {bg:P.purpleM, fg:P.red,    bold:true, numFmt:numFmt}),
+      cs(totC,    {bg:P.purpleM, fg:P.amber,  bold:true, numFmt:numFmt}),
+      cs(bgTot,   {bg: bgTot>=0?P.green:P.red, fg:P.white, bold:true, numFmt:numFmt}),
+    ],
+    [ emptyCell(P.white),emptyCell(P.white),emptyCell(P.white),emptyCell(P.white),emptyCell(P.white),emptyCell(P.white) ],
+    // Métricas
+    [ cs('Métricas clave', {bg:P.purpleL, fg:P.purple, bold:true, sz:11, align:'left', border:false}), emptyCell(P.purpleL),emptyCell(P.purpleL),emptyCell(P.purpleL),emptyCell(P.purpleL),emptyCell(P.purpleL) ],
+    [ cs('Promedio mensual de ingresos',  {bg:P.white,  fg:P.mid, align:'left'}), cs(avgG, {fg:P.green, numFmt:numFmt}), emptyCell(P.white),emptyCell(P.white),emptyCell(P.white),emptyCell(P.white) ],
+    [ cs('Promedio mensual de inversión', {bg:P.rowAlt, fg:P.mid, align:'left'}), cs(avgI, {bg:P.rowAlt, fg:P.blue,  numFmt:numFmt}), emptyCell(P.rowAlt),emptyCell(P.rowAlt),emptyCell(P.rowAlt),emptyCell(P.rowAlt) ],
+    [ cs('Promedio mensual de deudas',    {bg:P.white,  fg:P.mid, align:'left'}), cs(avgD, {fg:P.red,   numFmt:numFmt}), emptyCell(P.white),emptyCell(P.white),emptyCell(P.white),emptyCell(P.white) ],
+    [ cs('Promedio mensual de consumo',   {bg:P.rowAlt, fg:P.mid, align:'left'}), cs(avgC, {bg:P.rowAlt, fg:P.amber, numFmt:numFmt}), emptyCell(P.rowAlt),emptyCell(P.rowAlt),emptyCell(P.rowAlt),emptyCell(P.rowAlt) ],
+    [ cs('Meses registrados',             {bg:P.white,  fg:P.mid, align:'left'}), cs(n,    {fg:P.purple, bold:true}), emptyCell(P.white),emptyCell(P.white),emptyCell(P.white),emptyCell(P.white) ],
+  ]);
+
+  var merges1 = [
+    {s:{c:0,r:0},e:{c:5,r:0}},
+    {s:{c:0,r:1},e:{c:5,r:1}},
+    {s:{c:0,r:rows1.length-6},e:{c:5,r:rows1.length-6}}, // Métricas clave
+  ];
+  var rh1 = rows1.map(function(_,i){ return i===0?32:(i===1?14:20); });
+  var ws1 = writeSheet(rows1, [22,18,18,18,18,18], rh1, merges1);
+  XS.utils.book_append_sheet(wb, ws1, 'Resumen');
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // HOJAS POR MES
+  // ════════════════════════════════════════════════════════════════════════════
+  keys.forEach(function(k) {
+    var d = DB[k];
+    var g=sum(d.gano), inv=sum(d.invierto), de=sum(d.debo), con=sum(d.consumo);
+    var bg = g - de - con;
+    var rows = [], merges = [], r = 0;
+
+    // Título
+    rows.push([ cs(k, {bg:P.purple,fg:P.white,bold:true,sz:14,align:'center',border:false}), emptyCell(P.purple),emptyCell(P.purple),emptyCell(P.purple) ]);
+    merges.push({s:{c:0,r:r},e:{c:3,r:r}}); r++;
+    rows.push([ cs('DGO Capital Finance', {bg:P.purpleL,fg:P.mid,italic:true,sz:9,align:'center',border:false}), emptyCell(P.purpleL),emptyCell(P.purpleL),emptyCell(P.purpleL) ]);
+    merges.push({s:{c:0,r:r},e:{c:3,r:r}}); r++;
+    rows.push([emptyCell(P.white),emptyCell(P.white),emptyCell(P.white),emptyCell(P.white)]); r++;
+
+    function section(title, items, total, secBg, secFg, secLightBg) {
+      // Header sección
+      rows.push([ cs(title, {bg:secBg,fg:P.white,bold:true,sz:11,align:'left'}), emptyCell(secBg),emptyCell(secBg),emptyCell(secBg) ]);
+      merges.push({s:{c:0,r:r},e:{c:3,r:r}}); r++;
+      // Sub-encabezados
+      rows.push([
+        cs('Descripción', {bg:P.purpleL,fg:P.dark,bold:true,sz:10,align:'left'}),
+        cs('Valor',       {bg:P.purpleL,fg:P.dark,bold:true,sz:10,align:'right'}),
+        cs('Tipo',        {bg:P.purpleL,fg:P.dark,bold:true,sz:10,align:'center'}),
+        emptyCell(P.purpleL),
+      ]); r++;
+      // Items
+      if (items.length) {
+        items.forEach(function(it, idx) {
+          var rb = idx%2===0 ? P.white : P.rowAlt;
+          rows.push([
+            cs(it.desc,      {bg:rb, fg:P.dark, align:'left'}),
+            cs(it.val,       {bg:rb, fg:secFg,  numFmt:numFmt}),
+            cs(it.tipo||'—', {bg:rb, fg:P.mid,  sz:9, italic:true, align:'center'}),
+            emptyCell(rb),
+          ]); r++;
+        });
+      } else {
+        rows.push([ cs('(sin registros)', {bg:P.white, fg:P.light, italic:true, align:'left'}), emptyCell(P.white),emptyCell(P.white),emptyCell(P.white) ]); r++;
+      }
+      // Total sección
+      rows.push([
+        cs('Total ' + title.toLowerCase(), {bg:secLightBg, fg:secFg, bold:true, align:'left'}),
+        cs(total, {bg:secLightBg, fg:secFg, bold:true, numFmt:numFmt}),
+        emptyCell(secLightBg), emptyCell(secLightBg),
+      ]); r++;
+      // Espacio
+      rows.push([emptyCell(P.white),emptyCell(P.white),emptyCell(P.white),emptyCell(P.white)]); r++;
+    }
+
+    section('Ingresos', d.gano,     g,   P.green, P.green, P.greenL);
+    section('Invierto', d.invierto, inv, P.blue,  P.blue,  P.blueL);
+    section('Deudas',   d.debo,     de,  P.red,   P.red,   P.redL);
+    section('Consumo',  d.consumo,  con, P.amber, P.amber, P.amberL);
+
+    // Balance del mes
+    var balBg = bg>=0 ? P.green : P.red;
+    rows.push([
+      cs('Balance libre del mes', {bg:balBg, fg:P.white, bold:true, sz:12, align:'left'}),
+      cs(bg, {bg:balBg, fg:P.white, bold:true, sz:12, numFmt:numFmt}),
+      emptyCell(balBg), emptyCell(balBg),
+    ]);
+    merges.push({s:{c:0,r:r},e:{c:1,r:r}}); r++;
+
+    // Nota inversión
+    rows.push([emptyCell(P.white),emptyCell(P.white),emptyCell(P.white),emptyCell(P.white)]); r++;
+    rows.push([ cs('* La inversión registrada es parte de lo que ganas — no resta del balance libre.', {bg:P.purpleL, fg:P.mid, italic:true, sz:8, align:'left', border:false, wrap:true}), emptyCell(P.purpleL),emptyCell(P.purpleL),emptyCell(P.purpleL) ]);
+    merges.push({s:{c:0,r:r},e:{c:3,r:r}}); r++;
+
+    // Notas
+    if (d.notes) {
+      rows.push([emptyCell(P.white),emptyCell(P.white),emptyCell(P.white),emptyCell(P.white)]); r++;
+      rows.push([ cs('Notas del mes', {bg:P.purpleL, fg:P.purple, bold:true, sz:10, align:'left'}), emptyCell(P.purpleL),emptyCell(P.purpleL),emptyCell(P.purpleL) ]);
+      merges.push({s:{c:0,r:r},e:{c:3,r:r}}); r++;
+      rows.push([ cs(d.notes, {bg:P.white, fg:P.mid, italic:true, sz:9, align:'left', wrap:true}), emptyCell(P.white),emptyCell(P.white),emptyCell(P.white) ]);
+      merges.push({s:{c:0,r:r},e:{c:3,r:r}}); r++;
+    }
+
+    var rh = rows.map(function(_,i){ return i===0?28:(i===1?12:18); });
+    var ws = writeSheet(rows, [32,18,12,4], rh, merges);
+    var sheetName = k.split(' ')[0].substring(0,3)+' '+k.split(' ')[1];
+    XS.utils.book_append_sheet(wb, ws, sheetName);
+  });
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // HOJA FACTURAS
+  // ════════════════════════════════════════════════════════════════════════════
+  if (FACTURAS.length) {
+    var fRows = [], fMerges = [];
+    fRows.push([ cs('Facturas y Pagos Recurrentes', {bg:P.purple,fg:P.white,bold:true,sz:13,align:'center',border:false}), emptyCell(P.purple),emptyCell(P.purple) ]);
+    fMerges.push({s:{c:0,r:0},e:{c:2,r:0}});
+    fRows.push([emptyCell(P.white),emptyCell(P.white),emptyCell(P.white)]);
+    fRows.push([
+      cs('Nombre',      {bg:P.purple,fg:P.white,bold:true,sz:10,align:'left'}),
+      cs('Día del mes', {bg:P.purple,fg:P.white,bold:true,sz:10,align:'center'}),
+      cs('Frecuencia',  {bg:P.purple,fg:P.white,bold:true,sz:10,align:'center'}),
+    ]);
+    FACTURAS.forEach(function(f,idx) {
+      var rb = idx%2===0 ? P.white : P.rowAlt;
+      fRows.push([
+        cs(f.name,           {bg:rb, fg:P.dark,   align:'left'}),
+        cs(f.dia,            {bg:rb, fg:P.purple,  align:'center', bold:true}),
+        cs(f.freq||'mensual',{bg:rb, fg:P.mid,     align:'center'}),
+      ]);
+    });
+    var wsF = writeSheet(fRows, [32,14,14], fRows.map(function(_,i){return i===0?26:18;}), fMerges);
+    XS.utils.book_append_sheet(wb, wsF, 'Facturas');
+  }
+
+  // ── Descargar ─────────────────────────────────────────────────────────────
   var fecha = new Date();
-  var nombreArchivo = 'DGOCapital_Finance_' + fecha.getFullYear() + String(fecha.getMonth()+1).padStart(2,'0') + String(fecha.getDate()).padStart(2,'0') + '.xlsx';
-  XLSX.writeFile(wb, nombreArchivo);
+  var nombre = 'DGOCapital_Finance_'+fecha.getFullYear()+String(fecha.getMonth()+1).padStart(2,'0')+String(fecha.getDate()).padStart(2,'0')+'.xlsx';
+  XS.writeFile(wb, nombre);
 }
 
 document.getElementById('btn-export-excel').addEventListener('click', exportToExcel);
+
+
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
