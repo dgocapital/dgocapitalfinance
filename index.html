@@ -6,9 +6,9 @@
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta http-equiv="Expires" content="0"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
-<meta name="theme-color" content="#07111f"/>
+<meta name="theme-color" content="#f4f2f9"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <meta name="apple-mobile-web-app-title" content="DGO Capital"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" sizes="512x512" href="apple-touch-icon.png"/>
@@ -19,14 +19,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --bg:#07111f;--bg2:#0d1c2e;--bg3:#112236;--bg4:#162d45;
-  --border:#1e3a54;--border2:#254d6b;
-  --text:#dde8f2;--text2:#7a9bb8;--text3:#3d6480;
-  --accent:#1a56db;--accent2:#4d8af0;--accent-dim:#0d2550;
-  --green:#0ea66e;--green-dim:#062e1e;--green-soft:#0a3d29;
-  --red:#e84545;--red-dim:#2e0f0f;--red-soft:#3d1616;
-  --blue:#2f8bdb;--blue-soft:#0c2640;
-  --amber:#d4900f;--amber-soft:#2e2000;
+  /* DGO Capital Finance — Tema claro morado */
+  --bg:#f4f2f9;--bg2:#ede9f7;--bg3:#ffffff;--bg4:#e8e3f5;
+  --border:#d4cdef;--border2:#c0b8e8;
+  --text:#1a1535;--text2:#5a5280;--text3:#9b93bc;
+  --accent:#6b3fa0;--accent2:#9b6dd4;--accent-dim:#ede9f7;
+  --green:#0a8a5a;--green-dim:#d6f5ea;--green-soft:#e8faf3;
+  --red:#c0392b;--red-dim:#fde8e6;--red-soft:#fef0ef;
+  --blue:#1a6ab5;--blue-soft:#deeaf8;
+  --amber:#b06000;--amber-soft:#fef3e2;
   --r-sm:0px;--r:0px;--r-lg:0px;--r-xl:0px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -338,7 +339,7 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
           <div><div class="sec-name">Lo que gano</div><div class="sec-sub" style="color:var(--green)">Ingresos del mes</div></div>
         </div>
         <div class="sec-right">
-          <span class="info-wrap" id="tip-wrap-gano"><button class="info-btn" onclick="toggleTip('tip-wrap-gano',event)" title="Ayuda">i</button><span class="info-tip">💰 <b>Ingresos del mes</b><br>Registra todo lo que ingresa a tu bolsillo: salario, freelance, ventas, arriendos cobrados, etc. Usa la descripción para identificar la fuente.</span></span>
+          <span class="info-wrap" id="tip-wrap-gano"><button class="info-btn" onclick="toggleTip('tip-wrap-gano',event)" title="Ayuda">i</button><span class="info-tip">💰 <b>Ingresos del mes</b><br>Registra todo lo que ingresa a tu bolsillo: salario, freelance, ventas, arriendos cobrados, etc.<br><br>💡 <b>Tip:</b> Si te pagan los 15 y 30, regístralo el 1 del mes siguiente para que cubra el presupuesto completo de ese mes.</span></span>
           <span class="sec-tot" style="color:var(--green)" id="stot-gano">$ 0</span>
           <span class="chev open" id="chev-gano">&#9660;</span>
         </div>
@@ -628,6 +629,7 @@ input:focus,textarea:focus,select:focus,button:focus{outline:none;}
       </div>
       <div class="set-row"><div><div class="set-label">Meses registrados</div><div class="set-sub" id="set-months-count">0 meses</div></div></div>
       <div class="set-row"><div><div class="set-label">Exportar datos</div><div class="set-sub">Copia o comparte todos tus registros</div></div><button class="set-btn" id="btn-export">Exportar</button></div>
+      <div class="set-row"><div><div class="set-label">Exportar a Excel</div><div class="set-sub">Descarga un libro .xlsx con todos tus meses</div></div><button class="set-btn" id="btn-export-excel" style="color:var(--green);">Excel</button></div>
       <div class="set-row"><div><div class="set-label">Importar datos</div><div class="set-sub">Restaura un respaldo exportado</div></div><button class="set-btn" id="btn-import" style="color:var(--green);">Importar</button></div>
       <div class="set-row"><div><div class="set-label">Version</div><div class="set-sub">DGO Capital Finance v1.4</div></div></div>
     </div>
@@ -2520,6 +2522,103 @@ if(budPctEl && DB._cfg && DB._cfg.savePct) {
   budPctEl.value = DB._cfg.savePct;
 }
 updateCurrencyUI(); renderPills(); renderCurrent(); renderBalanceInicialRegistro();
+// ── EXPORTAR A EXCEL ─────────────────────────────────────────────────────────
+function exportToExcel() {
+  var keys = mkeys();
+  if (!keys.length) { alert('No hay datos para exportar.'); return; }
+  var sym = CC.symbol;
+  if (typeof XLSX === 'undefined') {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload = function(){ buildExcel(keys, sym); };
+    s.onerror = function(){ alert('No se pudo cargar la libreria de Excel. Verifica tu conexion.'); };
+    document.head.appendChild(s);
+  } else {
+    buildExcel(keys, sym);
+  }
+}
+
+function buildExcel(keys, sym) {
+  var wb = XLSX.utils.book_new();
+
+  // Hoja 1: Resumen general
+  var resumenData = [
+    ['DGO Capital Finance — Resumen General'],
+    [''],
+    ['Mes', 'Ingresos', 'Invierto', 'Deudas', 'Consumo', 'Balance libre'],
+  ];
+  var totG=0, totI=0, totD=0, totC=0;
+  keys.forEach(function(k) {
+    var d = DB[k];
+    var g=sum(d.gano), inv=sum(d.invierto), de=sum(d.debo), con=sum(d.consumo);
+    var bg = g - de - con;
+    totG+=g; totI+=inv; totD+=de; totC+=con;
+    resumenData.push([k, g, inv, de, con, bg]);
+  });
+  resumenData.push(['']);
+  resumenData.push(['TOTAL', totG, totI, totD, totC, totG - totD - totC]);
+  var wsResumen = XLSX.utils.aoa_to_sheet(resumenData);
+  wsResumen['!cols'] = [{wch:18},{wch:16},{wch:16},{wch:16},{wch:16},{wch:16}];
+  XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumen');
+
+  // Hojas por mes
+  keys.forEach(function(k) {
+    var d = DB[k];
+    var g=sum(d.gano), inv=sum(d.invierto), de=sum(d.debo), con=sum(d.consumo);
+    var bg = g - de - con;
+    var rows = [
+      ['DGO Capital Finance — ' + k],
+      [''],
+      ['INGRESOS', ''],
+      ['Descripcion', 'Valor'],
+    ];
+    if (d.gano.length) { d.gano.forEach(function(it){ rows.push([it.desc, it.val]); }); }
+    else { rows.push(['(sin ingresos)', '']); }
+    rows.push(['Total ingresos', g]);
+    rows.push(['']);
+    rows.push(['INVIERTO', '']);
+    rows.push(['Descripcion', 'Valor']);
+    if (d.invierto.length) { d.invierto.forEach(function(it){ rows.push([it.desc, it.val]); }); }
+    else { rows.push(['(sin inversiones)', '']); }
+    rows.push(['Total invierto', inv]);
+    rows.push(['']);
+    rows.push(['DEUDAS', '']);
+    rows.push(['Descripcion', 'Valor']);
+    if (d.debo.length) { d.debo.forEach(function(it){ rows.push([it.desc, it.val]); }); }
+    else { rows.push(['(sin deudas)', '']); }
+    rows.push(['Total deudas', de]);
+    rows.push(['']);
+    rows.push(['CONSUMO', '']);
+    rows.push(['Descripcion', 'Valor', 'Tipo']);
+    if (d.consumo.length) { d.consumo.forEach(function(it){ rows.push([it.desc, it.val, it.tipo||'normal']); }); }
+    else { rows.push(['(sin gastos)', '', '']); }
+    rows.push(['Total consumo', con]);
+    rows.push(['']);
+    rows.push(['BALANCE LIBRE DEL MES', bg]);
+    if (d.notes) { rows.push(['']); rows.push(['Notas:', d.notes]); }
+    var sheetName = k.substring(0,3) + ' ' + k.split(' ')[1];
+    if (sheetName.length > 31) sheetName = sheetName.substring(0,31);
+    var ws = XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols'] = [{wch:28},{wch:16},{wch:12}];
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  });
+
+  // Hoja Facturas
+  if (FACTURAS.length) {
+    var fRows = [['FACTURAS / PAGOS RECURRENTES'],[''],['Nombre', 'Dia del mes', 'Frecuencia']];
+    FACTURAS.forEach(function(f){ fRows.push([f.name, f.dia, f.freq||'mensual']); });
+    var wsF = XLSX.utils.aoa_to_sheet(fRows);
+    wsF['!cols'] = [{wch:28},{wch:14},{wch:14}];
+    XLSX.utils.book_append_sheet(wb, wsF, 'Facturas');
+  }
+
+  var fecha = new Date();
+  var nombreArchivo = 'DGOCapital_Finance_' + fecha.getFullYear() + String(fecha.getMonth()+1).padStart(2,'0') + String(fecha.getDate()).padStart(2,'0') + '.xlsx';
+  XLSX.writeFile(wb, nombreArchivo);
+}
+
+document.getElementById('btn-export-excel').addEventListener('click', exportToExcel);
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </body>
