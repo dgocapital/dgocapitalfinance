@@ -956,7 +956,7 @@ function updateCurrencyUI() {
 function renderCurrent() {
   var d = DB[cur] || emptyMonth();
   var g=sum(d.gano), de=sum(d.debo), inv=sum(d.invierto), con=sum(d.consumo);
-  var bg = g - de - con;
+  var bg = g - de - con - inv;
   var ha = document.getElementById('hero-amount');
   ha.textContent = fmtF(bg);
   ha.className = 'hero-amount' + (bg>0?' pos':bg<0?' neg':'');
@@ -999,7 +999,7 @@ function renderSec(sec) {
   var ids = {gano:'hs-gano',debo:'hs-debo',invierto:'hs-inv',consumo:'hs-con'};
   var d = DB[cur];
   document.getElementById(ids[sec]).textContent = fmt(sum(d[sec]));
-  var bg = sum(d.gano)-sum(d.debo)-sum(d.consumo);
+  var bg = sum(d.gano)-sum(d.debo)-sum(d.consumo)-sum(d.invierto);
   var ha = document.getElementById('hero-amount');
   ha.textContent = fmtF(bg);
   ha.className = 'hero-amount' + (bg>0?' pos':bg<0?' neg':'');
@@ -2314,7 +2314,7 @@ function buildAnalysisPrompt(scope) {
   targetKeys.forEach(function(k) {
     var d = DB[k];
     var g = sum(d.gano), de = sum(d.debo), inv = sum(d.invierto), con = sum(d.consumo);
-    var bg = g - de - con;
+    var bg = g - de - con - inv;
     lines.push('=== ' + k + ' ===');
     lines.push('Ingresos: ' + sym + Math.round(g).toLocaleString('es-CO'));
     if (d.gano.length) d.gano.forEach(function(it){ lines.push('  - ' + it.desc + ': ' + sym + Math.round(it.val).toLocaleString('es-CO')); });
