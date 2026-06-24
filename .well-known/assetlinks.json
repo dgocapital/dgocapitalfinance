@@ -3,6 +3,9 @@
   "target": {
     "namespace": "android_app",
     "package_name": "com.dgocapital.finance",
-    "sha256_cert_fingerprints": ["93:58:19:08:7A:A9:1D:F4:43:ED:C2:CD:7A:B4:63:82:4A:96:1C:8E:94:E2:4E:F7:D9:B9:BC:D2:60:F5:64:1E"]
+    "sha256_cert_fingerprints": [
+      "93:58:19:08:7A:A9:1D:F4:43:ED:C2:CD:7A:B4:63:82:4A:96:1C:8E:94:E2:4E:F7:D9:B9:BC:D2:60:F5:64:1E",
+      "9A:88:5B:F4:DE:2A:1C:32:79:3F:56:12:38:80:BF:FA:1E:17:55:02:EB:D8:26:AC:F0:53:00:CC:61:B4:C8:8A"
+    ]
   }
 }]
